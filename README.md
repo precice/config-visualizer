@@ -8,13 +8,13 @@ This readme describes the installation and various functionalities of this tool
 
 ## Installation
 
-Clone the repository:
+Clone the repository:\\
 `git clone git@github.com:precice/config-visualizer`
 
-Install the requirements
-`python -m pip install requirements.txt`
+Install the requirements\\
+`python setup.py`
 
-Run the tool
+Run the tool\\
 `python3 visualize.py <precice config filename>`
 
 ## Functionalities
@@ -24,20 +24,29 @@ at startup or as stdin at runtime. Most of the optional parameters are used
 to hide or simplify the various relationsips between participants, communicators
  and meshes---use them to adjust the fidelity of output as required for easier viewing.
 
-  Positional Parameters
+  ### Positional Parameters
+  ```
   infile, 
           The XML configuration file. Omit to read from stdin.
+  ```
 
-  Optional Parameters
+  ### Optional Parameters
+  ```
   -o [OUTFILE], --outfile [OUTFILE] 
           The resulting dot file. Omit to output to stdout.
+
   --data-access {full,merged,hide} 
           Verbosity of the displayed read/write access between mesh and participant.
+
   --data-exchange {full,merged,hide} 
           Verbosity of the displayed data exchange between meshes.
+
   --communicators {full,merged,hide} 
           Verbosity of the displayed of communicators.
+
   --cplschemes {full,merged,hide} 
           Verbosity of the displayed of coupling schemes.
+
   --no-colors           
           Disable colors in the output.
+ ```
