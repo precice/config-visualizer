@@ -1,0 +1,210 @@
+#! python3
+
+from lxml import etree
+import pydot
+import argparse
+import sys
+import seaborn
+
+
+def parseXML(content):
+    p = etree.XMLParser(recover=True, remove_comments=True)
+    return etree.fromstring(content, p)
+
+
+def parseXMLFile(file):
+    return parseXML(open("precice.xml", "rb").read())
+
+
+def addNode(g, name, **attrs):
+    n = pydot.Node(name, **attrs)
+    g.add_node(n)
+    return n
+
+
+def addEdge(g, src, dst, **attrs):
+    e = pydot.Edge(src, dst, **attrs)
+    g.add_edge(e)
+    return e
+
+
+def addUniqueEdge(g, src, dst, **attrs):
+    for e in g.get_edge_list():
+        es, ed = e.get_source().strip('"'), e.get_destination().strip('"')
+        if es == src and ed == dst:
+            return e
+    return addEdge(g, src, dst, **attrs)
+
+
+def getParticipantNames(solverinterface):
+    return [ p.attrib["name"] for p in solverinterface.findall("participant") ]
+
+
+def getParticipantColor(solverinterface, blackOnly=False):
+    names = getParticipantNames(solverinterface)
+    colors = None
+    if blackOnly:
+        colors = seaborn.color_palette("colorblind", len(names)).as_hex()
+    else:
+        colors = ["black"] * len(names)
+    return dict(zip(names, colors))
+
+
+def configToGraph(ast, args):
+    assert(ast.tag == "precice-configuration")
+    solverinterfaces = ast.findall("solver-interface")
+    assert(len(solverinterfaces) == 1)
+    si = solverinterfaces[0]
+
+    g = pydot.Graph(
+        layout="dot",
+        splines="true",
+        overlap="scale",
+        compound=True,
+        rankdir="LR",
+    )
+    dataType = {}
+    meshes = {}
+    participantClusterName = {}
+    m2nCluster = pydot.Cluster("m2n", label="Communicators")
+    g.add_subgraph(m2nCluster)
+    cplCluster = pydot.Cluster("cpl", label="Coupling Schemes")
+    g.add_subgraph(cplCluster)
+
+    participantColor = getParticipantColor(si, not args.no_colors)
+
+    for elem in si.iterchildren():
+        if (elem.tag.startswith("data")):
+            kind = elem.tag[elem.tag.find(":")+1:]
+            name = elem.attrib["name"]
+            dataType[name] = kind
+        elif "mesh" == elem.tag:
+            name = elem.attrib["name"]
+            meshes[name] = [
+                use.attrib["name"] for use in elem.findall("use-data")
+            ]
+        elif "participant" == elem.tag:
+            name = elem.attrib["name"]
+            participant = pydot.Cluster(name, label=name, style="bold")
+            participantClusterName[name] = participant.get_name()
+            color = participantColor[name]
+            addNode(participant, name, color=color, shape="doubleoctagon")
+            # use-mesh
+            for use in elem.findall("use-mesh"):
+                mesh = use.attrib["name"]
+                meshname = f"{name}-{mesh}"
+                provided = "provide" in use.attrib
+                if provided:
+                    addNode(participant, meshname, shape="cylinder", label=mesh, color=color)
+                else:
+                    pfrom = use.attrib["from"]
+                    addNode(participant, meshname, shape="cylinder", label=f"{mesh}\nfrom {pfrom}",
+                            color=participantColor[pfrom], style="dashed"
+                        )
+            # read-data
+            for read in elem.findall("read-data"):
+                mesh = read.attrib["mesh"]
+                data = read.attrib["name"]
+                if args.data_access == "full":
+                    addEdge(participant, f"{name}-{mesh}", name, label=f"{data}", tooltip=dataType[data], color=color)
+                elif args.data_access == "merged":
+                    addUniqueEdge(participant, f"{name}-{mesh}", name)
+            # write-data
+            for write in elem.findall("write-data"):
+                mesh = write.attrib["mesh"]
+                data = write.attrib["name"]
+                if args.data_access == "full":
+                    addEdge(participant, name, f"{name}-{mesh}", label=f"{data}", tooltip=dataType[data], color=color)
+                elif args.data_access == "merged":
+                    addUniqueEdge(participant, name, f"{name}-{mesh}")
+            # other children
+            for child in elem.iterchildren():
+                # mapping
+                if child.tag.startswith("mapping:"):
+                    mkind = child.tag[child.tag.find(":")+1:]
+                    mfrom = child.attrib["from"]
+                    mto = child.attrib["to"]
+                    addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", label=mkind)
+                # master
+                if child.tag.startswith("master:"):
+                    kind = child.tag[child.tag.find(":")+1:]
+                    addNode(participant, name+kind, shape="component", label=kind)
+            g.add_subgraph(participant)
+        # m2n
+        elif elem.tag.startswith("m2n"):
+            kind = elem.tag[elem.tag.find(":")+1:]
+            pto = elem.attrib["to"]
+            pfrom = elem.attrib["from"]
+            name = f"m2n-{pto}-{pfrom}"
+            if args.communicators == "full":
+                addNode(m2nCluster, name, shape="component", label=kind)
+                addEdge(g, name, pto,   lhead=participantClusterName[pto],   dir="both", color=participantColor[pto])
+                addEdge(g, name, pfrom, lhead=participantClusterName[pfrom], dir="both", color=participantColor[pfrom])
+            if args.communicators == "merged":
+                addEdge(g, pfrom, pto, lhead=participantClusterName[pto], ltail=participantClusterName[pfrom], label=kind, dir="both")
+
+        # cpl schemes
+        elif elem.tag.startswith("coupling-scheme"):
+            kind = elem.tag[elem.tag.find(":")+1:]
+            # Every cplscheme apart from multi
+            name = "-".join(["cpl", "multi"]+[e.attrib["name"] for e in elem.findall("participant")])
+
+            if kind == "multi":
+                if args.cplschemes != "hide":
+                    addNode(cplCluster, name, shape="component", label=kind)
+                    for other in elem.findall("participant"):
+                        thisName = other.attrib["name"]
+                        e = addEdge(g, name, thisName,  lhead=participantClusterName[thisName],   color=participantColor[thisName])
+                        if other.get("control"):
+                            e.set_taillabel("Controller")
+            else:
+                # Every cplscheme apart from multi
+                first =  elem.find("participants").attrib["first"]
+                second = elem.find("participants").attrib["second"]
+                name = f"cpl-{first}-{second}"
+
+                if args.cplschemes == "full":
+                    addNode(cplCluster, name, shape="component", label=kind)
+                    addEdge(g, name, first,  lhead=participantClusterName[first],  taillabel="first",  color=participantColor[first])
+                    addEdge(g, name, second, lhead=participantClusterName[second], taillabel="second", color=participantColor[second])
+                elif args.cplschemes == "merged":
+                    addUniqueEdge(g, first, second, dir="both", lhead=participantClusterName[first],  headlabel="first", ltail=participantClusterName[second], taillabel="second", label=kind)
+
+            # exchange tags
+            # This is indepedant of the above
+            for exchange in elem.findall("exchange"):
+                mesh = exchange.attrib["mesh"]
+                data = exchange.attrib["data"]
+                pfrom = exchange.attrib["from"]
+                pto = exchange.attrib["to"]
+                if args.data_exchange == "full":
+                    addEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", label=f"{data}", tooltip=dataType[data], color=participantColor[pfrom])
+                elif args.data_exchange == "merged":
+                    addUniqueEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", color=participantColor[pfrom])
+
+    return g
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout, help="The resulting dot file. Omit to output to stdout.")
+    displayChoices = ['full', 'merged', 'hide']
+    parser.add_argument('--data-access',   choices=displayChoices, default="full", help="Verbosity of the displayed read/write access between mesh and participant.")
+    parser.add_argument('--data-exchange', choices=displayChoices, default="full", help="Verbosity of the displayed data exchange between meshes.")
+    parser.add_argument('--communicators', choices=displayChoices, default="full", help="Verbosity of the displayed of communicators.")
+    parser.add_argument('--cplschemes',    choices=displayChoices, default="full", help="Verbosity of the displayed of coupling schemes.")
+    parser.add_argument('--no-colors', action="store_true", help="Disable colors in the output.")
+    parser.add_argument('infile',  nargs='?', type=argparse.FileType('rb'), default=sys.stdin,  help="The XML configuration file. Omit to read from stdin.")
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    xml = parseXML(args.infile.read())
+    g = configToGraph(xml, args)
+    args.outfile.write(g.to_string())
+    # nx.drawing.nx_pydot.write_dot(g, args.outfile)
+
+
+if __name__ == "__main__":
+    main()
