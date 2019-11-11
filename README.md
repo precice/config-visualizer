@@ -12,11 +12,11 @@ This readme describes the installation and various functionalities of this tool
 
 2. Install the requirements
 
-```python setup.py```
+```python3 -m pip install .```
 
 3. Run the tool
 
-```python3 visualize.py <precice config filename>```
+```precice-config-visualizer <precice config filename>```
 
 ## Functionalities
 
