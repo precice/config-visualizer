@@ -12,7 +12,7 @@ This readme describes the installation and various functionalities of this tool
 
 2. Install the requirements
 
-```python3 -m pip install .```
+```python3 -m pip install --user .```
 
 3. Run the tool
 
