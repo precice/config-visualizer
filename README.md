@@ -8,14 +8,14 @@ This readme describes the installation and various functionalities of this tool
 
 ## Installation
 
-Clone the repository:\\
-`git clone git@github.com:precice/config-visualizer`
+1. Clone the repository:
+```git clone git@github.com:precice/config-visualizer```
 
-Install the requirements\\
-`python setup.py`
+2. Install the requirements
+```python setup.py```
 
-Run the tool\\
-`python3 visualize.py <precice config filename>`
+3. Run the tool
+```python3 visualize.py <precice config filename>```
 
 ## Functionalities
 
