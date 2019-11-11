@@ -1,6 +1,9 @@
 # preCICE Config-Visualizer
 
 The `config-visualizer` is a tool meant to help visualize and debug precice configuration xml files. 
+This tool produces a dot file as output, which visualizes the various communicators and meshes 
+defined in the configuration file and the movement of data between them.
+
 This readme describes the installation and various functionalities of this tool
 
 ## Installation
@@ -17,12 +20,15 @@ Run the tool
 ## Functionalities
 
 This code accepts several inputs seen below. These inputs can be accepted
-at startup or as stdin at runtime.
+at startup or as stdin at runtime. Most of the optional parameters are used
+to hide or simplify the various relationsips between participants, communicators
+ and meshes---use them to adjust the fidelity of output as required for easier viewing.
+
   Positional Parameters
   infile, 
           The XML configuration file. Omit to read from stdin.
 
-  Keyword Parameters
+  Optional Parameters
   -o [OUTFILE], --outfile [OUTFILE] 
           The resulting dot file. Omit to output to stdout.
   --data-access {full,merged,hide} 
