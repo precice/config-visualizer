@@ -22,9 +22,12 @@ setup(
         'seaborn'
     ],
     classifiers = [
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.7",
+        "Topic :: Scientific/Engineering :: Visualization",
         "Topic :: Utilities",
-        "License :: OSI Approved :: BSD License",
     ],
     scripts=[
         'bin/precice-config-visualizer'
