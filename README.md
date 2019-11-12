@@ -4,19 +4,22 @@ The `config-visualizer` is a tool meant to help visualize and debug precice conf
 
 This readme describes the installation and various functionalities of this tool
 
-## Installation
+## Installation options
 
-1. Clone the repository:
+1.  Clone the repository and install locally as an editable package.
+    This allows you to simply pull in order to update.
 
-```
-git clone git@github.com:precice/config-visualizer
-```
+    ```
+    git clone git@github.com:precice/config-visualizer
+    pip3 install --user -e config-visualizer
+    ```
 
-2. Install the requirements
+2.  Install directly from the GitHub repository.
+    This version does not require `git`.
 
-```
-python3 -m pip install --user .
-```
+    ```
+    pip3 install --user https://github.com:precice/config-visualizer/archive/master.zip
+    ```
 
 ## Usage
 
