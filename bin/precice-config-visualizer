@@ -6,6 +6,13 @@ import argparse
 import sys
 import seaborn
 
+if sys.version_info < (3, 6):
+    raise RuntimeError(
+        "This program requires python 3.6 or later but you attempted to run it"
+        " with python {}.{}".format(
+            sys.version_info.major. sys.version_info.minor
+        ))
+
 
 def parseXML(content):
     p = etree.XMLParser(recover=True, remove_comments=True)

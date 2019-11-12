@@ -16,6 +16,7 @@ setup(
     #url = "http://packages.python.org/an_example_pypi_project",
     packages=[],
     long_description=read('README.md'),
+    python_requires=">=3.6",
     install_requires = [
         'lxml',
         'pydot',
