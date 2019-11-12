@@ -8,17 +8,36 @@ This readme describes the installation and various functionalities of this tool
 
 1. Clone the repository:
 
-```git clone git@github.com:precice/config-visualizer```
+```
+git clone git@github.com:precice/config-visualizer
+```
 
 2. Install the requirements
 
-```python3 -m pip install --user .```
+```
+python3 -m pip install --user .
+```
 
-3. Run the tool
+## Usage
 
-```precice-config-visualizer <precice config filename>```
+Run the tool directly from the command line.
+
+Execute the following command to print some help on it:
+```
+precice-config-visualizer --help
+```
 
 ## Functionalities
+
+The tool transforms the xml configuration file into a dot graph file.
+```
+precice-config-visualizer <precice config filename>
+```
+
+It is pipe-friendly, so it can be used in scripts etc:
+```
+cat config.xml | precice-config-visualizer | dot -Tpdf > config.pdf
+```
 
 This code accepts several inputs seen below. These inputs can be accepted at startup or as stdin at runtime. Most of the optional parameters are used to hide or simplify the various relationships between participants, communicators and meshes---use them to adjust the fidelity of output as required for easier viewing.
 
