@@ -18,7 +18,7 @@ This readme describes the installation and various functionalities of this tool
     This version does not require `git`.
 
     ```
-    pip3 install --user https://github.com:precice/config-visualizer/archive/master.zip
+    pip3 install --user https://github.com/precice/config-visualizer/archive/master.zip
     ```
 
 ## Usage
