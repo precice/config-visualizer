@@ -10,7 +10,7 @@ This readme describes the installation and various functionalities of this tool
     This allows you to simply pull in order to update.
 
     ```
-    git clone git@github.com:precice/config-visualizer
+    git clone https://github.com/precice/config-visualizer.git
     pip3 install --user -e config-visualizer
     ```
 
