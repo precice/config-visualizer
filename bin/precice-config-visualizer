@@ -14,6 +14,10 @@ if sys.version_info < (3, 6):
         ))
 
 
+def quote(text):
+    return f'"{text}"'
+
+
 def parseXML(content):
     p = etree.XMLParser(recover=True, remove_comments=True)
     return etree.fromstring(content, p)
@@ -24,13 +28,13 @@ def parseXMLFile(file):
 
 
 def addNode(g, name, **attrs):
-    n = pydot.Node(name, **attrs)
+    n = pydot.Node(quote(name), **attrs)
     g.add_node(n)
     return n
 
 
 def addEdge(g, src, dst, **attrs):
-    e = pydot.Edge(src, dst, **attrs)
+    e = pydot.Edge(quote(src), quote(dst), **attrs)
     g.add_edge(e)
     return e
 
@@ -40,7 +44,9 @@ def addUniqueEdge(g, src, dst, **attrs):
         es, ed = e.get_source().strip('"'), e.get_destination().strip('"')
         if es == src and ed == dst:
             return e
-    return addEdge(g, src, dst, **attrs)
+    e = pydot.Edge(quote(src), quote(dst), **attrs)
+    g.add_edge(e)
+    return e
 
 
 def getParticipantNames(solverinterface):
@@ -73,9 +79,9 @@ def configToGraph(ast, args):
     dataType = {}
     meshes = {}
     participantClusterName = {}
-    m2nCluster = pydot.Cluster("m2n", label="Communicators")
+    m2nCluster = pydot.Cluster("m2n", label=quote("Communicators"))
     g.add_subgraph(m2nCluster)
-    cplCluster = pydot.Cluster("cpl", label="Coupling Schemes")
+    cplCluster = pydot.Cluster("cpl", label=quote("Coupling Schemes"))
     g.add_subgraph(cplCluster)
 
     participantColor = getParticipantColor(si, not args.no_colors)
@@ -92,7 +98,7 @@ def configToGraph(ast, args):
             ]
         elif "participant" == elem.tag:
             name = elem.attrib["name"]
-            participant = pydot.Cluster(name, label=name, style="bold")
+            participant = pydot.Cluster(name, label=quote(name), style="bold")
             participantClusterName[name] = participant.get_name()
             color = participantColor[name]
             addNode(participant, name, color=color, shape="doubleoctagon")
@@ -102,10 +108,10 @@ def configToGraph(ast, args):
                 meshname = f"{name}-{mesh}"
                 provided = "provide" in use.attrib
                 if provided:
-                    addNode(participant, meshname, shape="cylinder", label=mesh, color=color)
+                    addNode(participant, meshname, shape="cylinder", label=quote(mesh), color=color)
                 else:
                     pfrom = use.attrib["from"]
-                    addNode(participant, meshname, shape="cylinder", label=f"{mesh}\nfrom {pfrom}",
+                    addNode(participant, meshname, shape="cylinder", label=quote(f"{mesh}\nfrom {pfrom}"),
                             color=participantColor[pfrom], style="dashed"
                         )
             # read-data
@@ -113,7 +119,7 @@ def configToGraph(ast, args):
                 mesh = read.attrib["mesh"]
                 data = read.attrib["name"]
                 if args.data_access == "full":
-                    addEdge(participant, f"{name}-{mesh}", name, label=f"{data}", tooltip=dataType[data], color=color)
+                    addEdge(participant, f"{name}-{mesh}", name, label=quote(data), tooltip=dataType[data], color=color)
                 elif args.data_access == "merged":
                     addUniqueEdge(participant, f"{name}-{mesh}", name)
             # write-data
@@ -121,7 +127,7 @@ def configToGraph(ast, args):
                 mesh = write.attrib["mesh"]
                 data = write.attrib["name"]
                 if args.data_access == "full":
-                    addEdge(participant, name, f"{name}-{mesh}", label=f"{data}", tooltip=dataType[data], color=color)
+                    addEdge(participant, name, f"{name}-{mesh}", label=quote(data), tooltip=dataType[data], color=color)
                 elif args.data_access == "merged":
                     addUniqueEdge(participant, name, f"{name}-{mesh}")
             # other children
@@ -131,11 +137,11 @@ def configToGraph(ast, args):
                     mkind = child.tag[child.tag.find(":")+1:]
                     mfrom = child.attrib["from"]
                     mto = child.attrib["to"]
-                    addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", label=mkind)
+                    addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", label=quote(mkind))
                 # master
                 if child.tag.startswith("master:"):
                     kind = child.tag[child.tag.find(":")+1:]
-                    addNode(participant, name+kind, shape="component", label=kind)
+                    addNode(participant, name+kind, shape="component", label=quote(kind))
             g.add_subgraph(participant)
         # m2n
         elif elem.tag.startswith("m2n"):
@@ -144,11 +150,11 @@ def configToGraph(ast, args):
             pfrom = elem.attrib["from"]
             name = f"m2n-{pto}-{pfrom}"
             if args.communicators == "full":
-                addNode(m2nCluster, name, shape="component", label=kind)
+                addNode(m2nCluster, name, shape="component", label=quote(kind))
                 addEdge(g, name, pto,   lhead=participantClusterName[pto],   dir="both", color=participantColor[pto])
                 addEdge(g, name, pfrom, lhead=participantClusterName[pfrom], dir="both", color=participantColor[pfrom])
             if args.communicators == "merged":
-                addEdge(g, pfrom, pto, lhead=participantClusterName[pto], ltail=participantClusterName[pfrom], label=kind, dir="both")
+                addEdge(g, pfrom, pto, lhead=participantClusterName[pto], ltail=participantClusterName[pfrom], label=quote(kind), dir="both")
 
         # cpl schemes
         elif elem.tag.startswith("coupling-scheme"):
@@ -158,7 +164,7 @@ def configToGraph(ast, args):
 
             if kind == "multi":
                 if args.cplschemes != "hide":
-                    addNode(cplCluster, name, shape="component", label=kind)
+                    addNode(cplCluster, name, shape="component", label=quote(kind))
                     for other in elem.findall("participant"):
                         thisName = other.attrib["name"]
                         e = addEdge(g, name, thisName,  lhead=participantClusterName[thisName],   color=participantColor[thisName])
@@ -171,11 +177,11 @@ def configToGraph(ast, args):
                 name = f"cpl-{first}-{second}"
 
                 if args.cplschemes == "full":
-                    addNode(cplCluster, name, shape="component", label=kind)
-                    addEdge(g, name, first,  lhead=participantClusterName[first],  taillabel="first",  color=participantColor[first])
-                    addEdge(g, name, second, lhead=participantClusterName[second], taillabel="second", color=participantColor[second])
+                    addNode(cplCluster, name, shape="component", label=quote(kind))
+                    addEdge(g, name, first,  lhead=participantClusterName[first],  taillabel=quote("first"),  color=participantColor[first])
+                    addEdge(g, name, second, lhead=participantClusterName[second], taillabel=quote("second"), color=participantColor[second])
                 elif args.cplschemes == "merged":
-                    addUniqueEdge(g, first, second, dir="both", lhead=participantClusterName[first],  headlabel="first", ltail=participantClusterName[second], taillabel="second", label=kind)
+                    addUniqueEdge(g, first, second, dir="both", lhead=participantClusterName[first],  headlabel=quote("first"), ltail=participantClusterName[second], taillabel=quote("second"), label=quote(kind))
 
             # exchange tags
             # This is indepedant of the above
@@ -185,7 +191,7 @@ def configToGraph(ast, args):
                 pfrom = exchange.attrib["from"]
                 pto = exchange.attrib["to"]
                 if args.data_exchange == "full":
-                    addEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", label=f"{data}", tooltip=dataType[data], color=participantColor[pfrom])
+                    addEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", label=quote(data), tooltip=dataType[data], color=participantColor[pfrom])
                 elif args.data_exchange == "merged":
                     addUniqueEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", color=participantColor[pfrom])
 
