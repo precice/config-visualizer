@@ -158,6 +158,7 @@
             <mapping:nearest-neighbor direction="read" from="Solid_Collocations" to="Fluid_Collocations" constraint="consistent"/>
             <mapping:nearest-neighbor direction="write" from="Fluid_Azimuths" to="Solid_Azimuths" constraint="conservative"/>
 
+            <watch-point name="FluidWatcher" mesh="Fluid_Mesh0" coordinate="1;0.2;0" />
         </participant>
 
         <participant name="Solid">
@@ -195,6 +196,8 @@
             <write-data name="Collocations0" mesh="Solid_Collocations"/>
             <write-data name="Motions0" mesh="Solid_Motions"/>
             <read-data name="Azimuths0" mesh="Solid_Azimuths"/>
+
+            <watch-point name="SolidOrigin" mesh="Solid" coordinate="0;0;0" />
         </participant>
 
         <m2n:sockets from="Fluid" to="Solid" distribution-type="gather-scatter" exchange-directory="../"/>

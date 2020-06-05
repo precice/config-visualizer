@@ -130,6 +130,18 @@ def configToGraph(ast, args):
                     addEdge(participant, name, f"{name}-{mesh}", label=quote(data), tooltip=dataType[data], color=color)
                 elif args.data_access == "merged":
                     addUniqueEdge(participant, name, f"{name}-{mesh}")
+            # watchpoint
+            for watchpoint in elem.findall("watch-point"):
+                wpmesh = watchpoint.attrib["mesh"]
+                wpname = watchpoint.attrib["name"]
+                wpcoord = watchpoint.attrib["coordinate"]
+                if not args.no_watchpoints:
+                    wpnode = f"{name}-WP-{wpname}"
+                    addNode(participant, wpnode, shape="note", label=quote(f"{wpname}\nat ({wpcoord})"),
+                            color=color
+                        )
+                    addEdge(participant, wpnode, name, color=color)
+
             # other children
             for child in elem.iterchildren():
                 # mapping
@@ -206,6 +218,7 @@ def parse_args():
     parser.add_argument('--data-exchange', choices=displayChoices, default="full", help="Verbosity of the displayed data exchange between meshes.")
     parser.add_argument('--communicators', choices=displayChoices, default="full", help="Verbosity of the displayed of communicators.")
     parser.add_argument('--cplschemes',    choices=displayChoices, default="full", help="Verbosity of the displayed of coupling schemes.")
+    parser.add_argument('--no-watchpoints', action="store_true", help="Do not display watchpoints.")
     parser.add_argument('--no-colors', action="store_true", help="Disable colors in the output.")
     parser.add_argument('infile',  nargs='?', type=argparse.FileType('rb'), default=sys.stdin,  help="The XML configuration file. Omit to read from stdin.")
     return parser.parse_args()
