@@ -20,7 +20,6 @@ setup(
     install_requires = [
         'lxml',
         'pydot',
-        'seaborn'
     ],
     classifiers = [
         "Development Status :: 4 - Beta",

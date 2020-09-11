@@ -4,7 +4,7 @@ from lxml import etree
 import pydot
 import argparse
 import sys
-import seaborn
+from itertools import cycle
 
 if sys.version_info < (3, 6):
     raise RuntimeError(
@@ -57,9 +57,10 @@ def getParticipantColor(solverinterface, blackOnly=False):
     names = getParticipantNames(solverinterface)
     colors = None
     if blackOnly:
-        colors = seaborn.color_palette("colorblind", len(names)).as_hex()
+        colors = cycle(["black"])
     else:
-        colors = ["black"] * len(names)
+        colorblind = ["#0173B2", "#DE8F05", "#029E73", "#D55E00", "#CC78BC", "#CA9161", "#FBAFE4", "#949494", "#ECE133", "#56B4E9"],
+        colors = cycle(colorblind)
     return dict(zip(names, colors))
 
 
@@ -84,7 +85,7 @@ def configToGraph(ast, args):
     cplCluster = pydot.Cluster("cpl", label=quote("Coupling Schemes"))
     g.add_subgraph(cplCluster)
 
-    participantColor = getParticipantColor(si, not args.no_colors)
+    participantColor = getParticipantColor(si, args.no_colors)
 
     for elem in si.iterchildren():
         if (elem.tag.startswith("data")):
