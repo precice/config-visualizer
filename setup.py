@@ -14,7 +14,8 @@ setup(
     description = "A tool for visualizing a preCICE configuration file as a dot file.",
     license = "GPLv3",
     #url = "http://packages.python.org/an_example_pypi_project",
-    packages=["precice"],
+    packages=[],
+    py_modules=["precice.config_visualizer"],
     long_description=read('README.md'),
     python_requires=">=3.6",
     install_requires = [
