@@ -21,6 +21,8 @@ This readme describes the installation and various functionalities of this tool
     pip3 install --user https://github.com/precice/config-visualizer/archive/master.zip
     ```
 
+Note: You maybe need to add your user pip installations to your path to make the config visualizer findable, i.e. `export PATH=$PATH:$HOME/.local/bin`.
+
 ## Usage
 
 Run the tool directly from the command line.
@@ -41,6 +43,8 @@ It is pipe-friendly, so it can be used in scripts etc:
 ```
 cat config.xml | precice-config-visualizer | dot -Tpdf > config.pdf
 ```
+
+Note: The `dot` tool is part of the [graphviz package](https://www.ubuntuupdates.org/package/core/groovy/universe/base/graphviz).
 
 This code accepts several inputs seen below. These inputs can be accepted at startup or as stdin at runtime. Most of the optional parameters are used to hide or simplify the various relationships between participants, communicators and meshes---use them to adjust the fidelity of output as required for easier viewing.
 
