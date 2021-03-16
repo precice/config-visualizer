@@ -24,7 +24,7 @@ def parseXML(content):
 
 
 def parseXMLFile(file):
-    return parseXML(open("precice.xml", "rb").read())
+    return parseXML(open("precice-config.xml", "rb").read())
 
 
 def addNode(g, name, **attrs):
@@ -227,7 +227,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    xml = parseXML(args.infile.read())
+    xml = parseXMLFile(args.infile.read())
     g = configToGraph(xml, args)
     args.outfile.write(g.to_string())
     # nx.drawing.nx_pydot.write_dot(g, args.outfile)
