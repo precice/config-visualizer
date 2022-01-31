@@ -225,9 +225,18 @@ def parse_args():
     return parser.parse_args()
 
 
+def readBinary(streamlike):
+    """
+    Reading binary from sys.stdin requires to use the underlying buffer instead
+    """
+    try:
+        return streamlike.buffer.read()
+    except:
+        return streamlike.read()
+
 def main():
     args = parse_args()
-    xml = parseXML(args.infile.read())
+    xml = parseXML(readBinary(args.infile))
     g = configToGraph(xml, args)
     args.outfile.write(g.to_string())
     # nx.drawing.nx_pydot.write_dot(g, args.outfile)
