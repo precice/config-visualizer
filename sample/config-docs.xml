@@ -1,0 +1,38 @@
+<precice-configuration>
+  <solver-interface dimensions="3">
+
+<data:scalar name="Temperature"/>
+<data:vector name="Forces"/>
+
+<mesh name="MyMesh1"> 
+  <use-data name="Temperature"/> 
+  <use-data name="Forces"/> 
+</mesh> 
+
+<participant name="MySolver1"> 
+    <use-mesh name="MyMesh1" provide="yes"/> 
+    <use-mesh name="MyMesh2" from="MySolver2"/>
+    <write-data name="Forces" mesh="MyMesh1"/> 
+    <read-data name="Temperature" mesh="MyMesh1"/> 
+    <mapping:nearest-neighbor direction="read" from="MyMesh2" to="MyMesh1" constraint="consistent"/>
+    <mapping:nearest-neighbor direction="write" from="MyMesh1" to="MyMesh2" constraint="conservative"/>
+</participant>
+
+<participant name="MySolver2"> 
+    <use-mesh name="MyMesh2" provide="yes"/> 
+    <read-data name="Forces" mesh="MyMesh2"/> 
+    <write-data name="Temperature" mesh="MyMesh2"/> 
+</participant>
+
+<m2n:sockets from="MySolver1" to="MySolver2" />   
+
+<coupling-scheme:parallel-explicit> 
+  <participants first="MySolver1" second="MySolver2"/> 
+  <max-time value="1.0"/> 
+  <time-window-size value="1e-2"/> 
+  <exchange data="Forces" mesh="MyMesh2" from="MySolver1" to="MySolver2"/>
+  <exchange data="Temperature" mesh="MyMesh2" from="MySolver2" to="MySolver1"/>
+</coupling-scheme:parallel-explicit>    
+
+  </solver-interface>
+</precice-configuration>
