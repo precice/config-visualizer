@@ -115,6 +115,19 @@ def configToGraph(ast, args):
                     addNode(participant, meshname, shape="cylinder", label=quote(f"{mesh}\nfrom {pfrom}"),
                             color=participantColor[pfrom], style="dashed"
                         )
+            # provide-mesh
+            for use in elem.findall("provide-mesh"):
+                mesh = use.attrib["name"]
+                meshname = f"{name}-{mesh}"
+                addNode(participant, meshname, shape="cylinder", label=quote(mesh), color=color)
+            # receive-mesh
+            for use in elem.findall("receive-mesh"):
+                mesh = use.attrib["name"]
+                meshname = f"{name}-{mesh}"
+                pfrom = use.attrib["from"]
+                addNode(participant, meshname, shape="cylinder", label=quote(f"{mesh}\nfrom {pfrom}"),
+                        color=participantColor[pfrom], style="dashed"
+                        )
             # read-data
             for read in elem.findall("read-data"):
                 mesh = read.attrib["mesh"]
