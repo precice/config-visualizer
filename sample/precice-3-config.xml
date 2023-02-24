@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+
+<precice-configuration>
+    <solver-interface dimensions="3">
+        <data:vector name="Forces_0_1"/>
+        <data:vector name="Moments_0_1"/>
+        <data:vector name="Forces_0_2"/>
+        <data:vector name="Moments_0_2"/>
+        <data:vector name="Forces_0_3"/>
+        <data:vector name="Moments_0_3"/>
+        <data:vector name="Forces_0_4"/>
+        <data:vector name="Moments_0_4"/>
+        <data:vector name="Forces_0_5"/>
+        <data:vector name="Moments_0_5"/>
+        <data:vector name="Forces_0_6"/>
+        <data:vector name="Moments_0_6"/>
+
+        <data:vector name="Forces_0_7"/>
+        <data:vector name="Moments_0_7"/>
+        <data:vector name="Forces_0_8"/>
+        <data:vector name="Moments_0_8"/>
+        <data:vector name="Forces_0_9"/>
+        <data:vector name="Moments_0_9"/>
+        <data:vector name="Forces_0_10"/>
+        <data:vector name="Moments_0_10"/>
+        <data:vector name="Forces_0_11"/>
+        <data:vector name="Moments_0_11"/>
+        <data:vector name="Forces_0_12"/>
+        <data:vector name="Moments_0_12"/>
+
+        <data:scalar name="Azimuths0"/>
+        <data:scalar name="Collocations0"/>
+        <data:scalar name="Motions0"/>
+        <mesh name="Fluid_Collocations">
+            <use-data name="Collocations0"/>
+        </mesh>
+
+        <mesh name="Solid_Collocations">
+            <use-data name="Collocations0"/>
+        </mesh>
+        
+        <mesh name="Fluid_Azimuths">
+            <use-data name="Azimuths0"/>
+        </mesh>
+        
+        <mesh name="Solid_Azimuths">
+            <use-data name="Azimuths0"/>
+        </mesh>
+
+        <mesh name="Fluid_Motions">
+          <use-data name="Motions0"/>
+        </mesh>
+
+        <mesh name="Solid_Motions">
+          <use-data name="Motions0"/>
+        </mesh>
+        <mesh name="Fluid_Mesh0">
+            <use-data name="Forces_0_1"/>
+            <use-data name="Moments_0_1"/>
+            <use-data name="Forces_0_2"/>
+            <use-data name="Moments_0_2"/>
+            <use-data name="Forces_0_3"/>
+            <use-data name="Moments_0_3"/>
+            <use-data name="Forces_0_4"/>
+            <use-data name="Moments_0_4"/>
+            <use-data name="Forces_0_5"/>
+            <use-data name="Moments_0_5"/>
+            <use-data name="Forces_0_6"/>
+            <use-data name="Moments_0_6"/>
+        </mesh>
+        <mesh name="Fluid_Mesh1">
+            <use-data name="Forces_0_7"/>
+            <use-data name="Moments_0_7"/>
+            <use-data name="Forces_0_8"/>
+            <use-data name="Moments_0_8"/>
+            <use-data name="Forces_0_9"/>
+            <use-data name="Moments_0_9"/>
+            <use-data name="Forces_0_10"/>
+            <use-data name="Moments_0_10"/>
+            <use-data name="Forces_0_11"/>
+            <use-data name="Moments_0_11"/>
+            <use-data name="Forces_0_12"/>
+            <use-data name="Moments_0_12"/>
+        </mesh>
+        <mesh name="Solid_Mesh0">
+            <use-data name="Forces_0_1"/>
+            <use-data name="Moments_0_1"/>
+            <use-data name="Forces_0_2"/>
+            <use-data name="Moments_0_2"/>
+            <use-data name="Forces_0_3"/>
+            <use-data name="Moments_0_3"/>
+            <use-data name="Forces_0_4"/>
+            <use-data name="Moments_0_4"/>
+            <use-data name="Forces_0_5"/>
+            <use-data name="Moments_0_5"/>
+            <use-data name="Forces_0_6"/>
+            <use-data name="Moments_0_6"/>
+        </mesh>
+        <mesh name="Solid_Mesh1">
+            <use-data name="Forces_0_7"/>
+            <use-data name="Moments_0_7"/>
+            <use-data name="Forces_0_8"/>
+            <use-data name="Moments_0_8"/>
+            <use-data name="Forces_0_9"/>
+            <use-data name="Moments_0_9"/>
+            <use-data name="Forces_0_10"/>
+            <use-data name="Moments_0_10"/>
+            <use-data name="Forces_0_11"/>
+            <use-data name="Moments_0_11"/>
+            <use-data name="Forces_0_12"/>
+            <use-data name="Moments_0_12"/>
+        </mesh>
+        <participant name="Fluid">
+            <master:mpi-single/>
+            <provide-mesh name="Fluid_Mesh0" />
+            <provide-mesh name="Fluid_Mesh1" />
+            <receive-mesh name="Solid_Mesh0" from="Solid" geometric-filter="no-filter"/>
+            <receive-mesh name="Solid_Mesh1" from="Solid" geometric-filter="no-filter"/>
+            <provide-mesh name="Fluid_Collocations" />
+            <provide-mesh name="Fluid_Motions" />
+            <provide-mesh name="Fluid_Azimuths" />
+            <receive-mesh name="Solid_Collocations" from="Solid"/>
+            <receive-mesh name="Solid_Motions" from="Solid"/>
+            <receive-mesh name="Solid_Azimuths" from="Solid"/>
+
+            <write-data name="Forces_0_1" mesh="Fluid_Mesh0"/>
+            <write-data name="Moments_0_1" mesh="Fluid_Mesh0"/>
+            <write-data name="Forces_0_2" mesh="Fluid_Mesh0"/>
+            <write-data name="Moments_0_2" mesh="Fluid_Mesh0"/>
+            <write-data name="Forces_0_3" mesh="Fluid_Mesh0"/>
+            <write-data name="Moments_0_3" mesh="Fluid_Mesh0"/>
+            <write-data name="Forces_0_4" mesh="Fluid_Mesh0"/>
+            <write-data name="Moments_0_4" mesh="Fluid_Mesh0"/>
+            <write-data name="Forces_0_5" mesh="Fluid_Mesh0"/>
+            <write-data name="Moments_0_5" mesh="Fluid_Mesh0"/>
+            <write-data name="Forces_0_6" mesh="Fluid_Mesh0"/>
+            <write-data name="Moments_0_6" mesh="Fluid_Mesh0"/>
+
+            <write-data name="Forces_0_7" mesh="Fluid_Mesh1"/>
+            <write-data name="Moments_0_7" mesh="Fluid_Mesh1"/>
+            <write-data name="Forces_0_8" mesh="Fluid_Mesh1"/>
+            <write-data name="Moments_0_8" mesh="Fluid_Mesh1"/>
+            <write-data name="Forces_0_9" mesh="Fluid_Mesh1"/>
+            <write-data name="Moments_0_9" mesh="Fluid_Mesh1"/>
+            <write-data name="Forces_0_10" mesh="Fluid_Mesh1"/>
+            <write-data name="Moments_0_10" mesh="Fluid_Mesh1"/>
+            <write-data name="Forces_0_11" mesh="Fluid_Mesh1"/>
+            <write-data name="Moments_0_11" mesh="Fluid_Mesh1"/>
+            <write-data name="Forces_0_12" mesh="Fluid_Mesh1"/>
+            <write-data name="Moments_0_12" mesh="Fluid_Mesh1"/>
+
+            <read-data name="Collocations0" mesh="Fluid_Collocations"/>
+            <read-data name="Motions0" mesh="Fluid_Motions"/>
+            <write-data name="Azimuths0" mesh="Fluid_Azimuths"/>
+            <mapping:nearest-neighbor direction="write" from="Fluid_Mesh0" to="Solid_Mesh0" constraint="conservative"/>
+            <mapping:nearest-neighbor direction="write" from="Fluid_Mesh1" to="Solid_Mesh1" constraint="conservative"/>
+            <mapping:nearest-neighbor direction="read" from="Solid_Motions" to="Fluid_Motions" constraint="consistent"/>
+            <mapping:nearest-neighbor direction="read" from="Solid_Collocations" to="Fluid_Collocations" constraint="consistent"/>
+            <mapping:nearest-neighbor direction="write" from="Fluid_Azimuths" to="Solid_Azimuths" constraint="conservative"/>
+
+            <watch-point name="FluidWatcher" mesh="Fluid_Mesh0" coordinate="1;0.2;0" />
+        </participant>
+
+        <participant name="Solid">
+            <provide-mesh name="Solid_Collocations" />
+            <provide-mesh name="Solid_Motions" />
+            <provide-mesh name="Solid_Azimuths" />
+            <provide-mesh name="Solid_Mesh0" />
+            <provide-mesh name="Solid_Mesh1" />
+            <read-data name="Forces_0_1" mesh="Solid_Mesh0"/>
+            <read-data name="Moments_0_1" mesh="Solid_Mesh0"/>
+            <read-data name="Forces_0_2" mesh="Solid_Mesh0"/>
+            <read-data name="Moments_0_2" mesh="Solid_Mesh0"/>
+            <read-data name="Forces_0_3" mesh="Solid_Mesh0"/>
+            <read-data name="Moments_0_3" mesh="Solid_Mesh0"/>
+            <read-data name="Forces_0_4" mesh="Solid_Mesh0"/>
+            <read-data name="Moments_0_4" mesh="Solid_Mesh0"/>
+            <read-data name="Forces_0_5" mesh="Solid_Mesh0"/>
+            <read-data name="Moments_0_5" mesh="Solid_Mesh0"/>
+            <read-data name="Forces_0_6" mesh="Solid_Mesh0"/>
+            <read-data name="Moments_0_6" mesh="Solid_Mesh0"/>
+
+            <read-data name="Forces_0_7" mesh="Solid_Mesh1"/>
+            <read-data name="Moments_0_7" mesh="Solid_Mesh1"/>
+            <read-data name="Forces_0_8" mesh="Solid_Mesh1"/>
+            <read-data name="Moments_0_8" mesh="Solid_Mesh1"/>
+            <read-data name="Forces_0_9" mesh="Solid_Mesh1"/>
+            <read-data name="Moments_0_9" mesh="Solid_Mesh1"/>
+            <read-data name="Forces_0_10" mesh="Solid_Mesh1"/>
+            <read-data name="Moments_0_10" mesh="Solid_Mesh1"/>
+            <read-data name="Forces_0_11" mesh="Solid_Mesh1"/>
+            <read-data name="Moments_0_11" mesh="Solid_Mesh1"/>
+            <read-data name="Forces_0_12" mesh="Solid_Mesh1"/>
+            <read-data name="Moments_0_12" mesh="Solid_Mesh1"/>
+
+            <write-data name="Collocations0" mesh="Solid_Collocations"/>
+            <write-data name="Motions0" mesh="Solid_Motions"/>
+            <read-data name="Azimuths0" mesh="Solid_Azimuths"/>
+
+            <watch-point name="SolidOrigin" mesh="Solid" coordinate="0;0;0" />
+        </participant>
+
+        <m2n:sockets from="Fluid" to="Solid" distribution-type="gather-scatter" exchange-directory="../"/>
+
+        <coupling-scheme:serial-explicit>
+            <timestep-length value="1"/>
+            <max-time value="1"/>
+            <participants first="Solid" second="Fluid"/>
+            <exchange data="Forces_0_1" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_1" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_2" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_2" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_3" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_3" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_4" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_4" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_5" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_5" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_6" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_6" mesh="Solid_Mesh0" from="Fluid" to="Solid"/>
+
+            <exchange data="Forces_0_7" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_7" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_8" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_8" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_9" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_9" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_10" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_10" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_11" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_11" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Forces_0_12" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+            <exchange data="Moments_0_12" mesh="Solid_Mesh1" from="Fluid" to="Solid"/>
+
+            <exchange data="Collocations0" mesh="Solid_Collocations" from="Solid" to="Fluid"/>
+            <exchange data="Motions0" mesh="Solid_Motions" from="Solid" to="Fluid"/>
+            <exchange data="Azimuths0" mesh="Solid_Azimuths" from="Fluid" to="Solid"/>
+            </coupling-scheme:serial-explicit>
+        </solver-interface>
+</precice-configuration>
