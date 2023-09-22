@@ -8,18 +8,20 @@ def read(fname):
 
 setup(
     name = "precice-config-visualizer",
-    version = "0.1.0",
+    version = "0.2.0",
     author = "The preCICE Developers",
     author_email = "info@precice.org",
     description = "A tool for visualizing a preCICE configuration file as a dot file.",
     license = "GPLv3",
     #url = "http://packages.python.org/an_example_pypi_project",
-    packages=[],
+    packages=[ 'precice.configvisualizer'],
     long_description=read('README.md'),
     python_requires=">=3.6",
     install_requires = [
         'lxml',
         'pydot',
+        'xdot',
+        'PyGObject'
     ],
     classifiers = [
         "Development Status :: 4 - Beta",
@@ -30,6 +32,7 @@ setup(
         "Topic :: Utilities",
     ],
     scripts=[
-        'bin/precice-config-visualizer'
+        'bin/precice-config-visualizer',
+        'bin/precice-config-visualizer-gui'
     ],
 )
