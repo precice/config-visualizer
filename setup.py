@@ -35,4 +35,7 @@ setup(
         'bin/precice-config-visualizer',
         'bin/precice-config-visualizer-gui'
     ],
+    data_files = [
+        ('share/applications', ['data/org.precice.configvisualizer.desktop']),
+    ],
 )

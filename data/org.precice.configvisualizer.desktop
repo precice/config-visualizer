@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=preCICE Config Visualizer
+Comment=Visualize preCICE configuration files
+Exec=precice-config-visualizer-gui %u
+Terminal=false
+Type=Application
+# Icon=org.precice.configvisualizer
+Categories=Development
+MimeType=application/xml
+StartupNotify=true
+StartupWMClass=preciceconfigvisualizer
