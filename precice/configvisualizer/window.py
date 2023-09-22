@@ -1,7 +1,7 @@
 import types
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gio
 import xdot.ui
 from precice.configvisualizer.common import configFileToDotCode
 
@@ -79,8 +79,23 @@ class ConfigVisualizerWindow(Gtk.Window):
         for x in optionsRow:
             self.bottom.pack_start(x, False, False, 0)
         self.show_all()
-        if self._filename is not None:
+        self.reload()
+        self.monitor()
+
+    def on_file_change(self, m, f, o, event):
+        if self.tool_refresh.get_active() and event == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.reload()
+
+    def monitor(self):
+        # No filename given?
+        if self._filename is None:
+            self._monitor = None
+            return
+
+        file = Gio.File.new_for_path(self._filename)
+        self._monitor = file.monitor_file(Gio.FileMonitorFlags.NONE, None)
+        self._monitor.connect("changed", self.on_file_change)
+
 
     def reload(self):
         if self._filename is None:
@@ -105,9 +120,6 @@ class ConfigVisualizerWindow(Gtk.Window):
 
         dot = configFileToDotCode(self._filename, args)
         self.dotwidget.set_dotcode(dot.encode())
-        #xml = parseXML(readBinary(open(self._filename, "rb")))
-        #g = configToGraph(xml, args)
-        #self.dotwidget.set_dotcode(g.to_string().encode())
 
     def on_open(self, caller):
         dialog = Gtk.FileChooserDialog(
@@ -130,6 +142,7 @@ class ConfigVisualizerWindow(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             self._filename = dialog.get_filename()
             self.reload()
+            self.monitor()
         dialog.destroy()
 
     def on_copy(self, caller):
@@ -139,7 +152,8 @@ class ConfigVisualizerWindow(Gtk.Window):
         pass
 
     def on_toogle_refresh(self, caller):
-        pass
+        if self.tool_refresh.get_active():
+            self.reload()
 
     def on_option_change(self, caller):
         self.reload()
