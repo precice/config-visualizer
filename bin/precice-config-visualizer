@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from precice.configvisualizer.common import configFileToDotCode
+from preciceconfigvisualizer.common import configFileToDotCode
 
 def parse_args():
     parser = argparse.ArgumentParser()

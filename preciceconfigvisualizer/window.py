@@ -3,7 +3,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, Gdk
 import xdot.ui
-from precice.configvisualizer.common import configFileToDotCode
+from preciceconfigvisualizer.common import configFileToDotCode
 import cairo
 from math import ceil
 
