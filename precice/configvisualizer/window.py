@@ -1,9 +1,11 @@
 import types
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk, Gio, Gdk
 import xdot.ui
 from precice.configvisualizer.common import configFileToDotCode
+import cairo
+from math import ceil
 
 def makeVisibilityCombobox(callback, withMerged = True):
         cb = Gtk.ComboBoxText()
@@ -29,11 +31,11 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.tool_open=Gtk.ToolButton(stock_id=Gtk.STOCK_OPEN)
         self.tool_open.connect("clicked", self.on_open)
         self.tool_save=Gtk.ToolButton(stock_id=Gtk.STOCK_SAVE_AS)
-        self.tool_open.connect("clicked", self.on_export)
+        self.tool_save.connect("clicked", self.on_export)
         self.tool_copy=Gtk.ToolButton(stock_id=Gtk.STOCK_COPY)
-        self.tool_open.connect("clicked", self.on_copy)
+        self.tool_copy.connect("clicked", self.on_copy)
         self.tool_refresh=Gtk.ToggleToolButton(stock_id=Gtk.STOCK_REFRESH, active=True)
-        self.tool_open.connect("clicked", self.on_toogle_refresh)
+        self.tool_refresh.connect("clicked", self.on_toogle_refresh)
 
         self.top.insert(self.tool_open, -1)
         self.top.insert(Gtk.SeparatorToolItem(), -1)
@@ -146,10 +148,43 @@ class ConfigVisualizerWindow(Gtk.Window):
         dialog.destroy()
 
     def on_copy(self, caller):
-        pass
+        width, height = map(ceil, self.dotwidget.graph.get_size())
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        ctx = cairo.Context(surface)
+        self.dotwidget.graph.draw(ctx)
+        pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, width, height)
+
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_image(pixbuf)
+        clipboard.store()
 
     def on_export(self, caller):
-        pass
+        dialog = Gtk.FileChooserDialog(
+            "Save As Image",
+            None,
+            Gtk.FileChooserAction.SAVE,
+            (
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE, Gtk.ResponseType.OK
+            )
+        )
+
+        filter_image = Gtk.FileFilter()
+        filter_image.set_name("PNG images")
+        filter_image.add_mime_type("image/png")
+        dialog.add_filter(filter_image)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            filename = dialog.get_filename()
+
+            width, height = map(ceil, self.dotwidget.graph.get_size())
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+            ctx = cairo.Context(surface)
+            self.dotwidget.graph.draw(ctx)
+            surface.write_to_png(filename)
+
+        dialog.destroy()
 
     def on_toogle_refresh(self, caller):
         if self.tool_refresh.get_active():
