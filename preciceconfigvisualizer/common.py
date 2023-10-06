@@ -71,10 +71,12 @@ def configToGraph(ast, args):
 
     solverinterfaces = ast.findall("solver-interface")
     precice_version = -1
+    si_dims = None # precice v2
 
     assert len(solverinterfaces) in [0,1]
     if(len(solverinterfaces) == 1):
         precice_version = 2
+        si_dims = solverinterfaces[0].attrib["dimensions"]
     elif(len(solverinterfaces) == 0):
         precice_version = 3
 
@@ -92,6 +94,7 @@ def configToGraph(ast, args):
     )
     dataType = {}
     meshes = {}
+    meshDims = {}
     participantClusterName = {}
     m2nCluster = pydot.Cluster("m2n", label=quote("Communicators"))
     g.add_subgraph(m2nCluster)
@@ -107,6 +110,7 @@ def configToGraph(ast, args):
             dataType[name] = kind
         elif "mesh" == elem.tag:
             name = elem.attrib["name"]
+            meshDims[name] = elem.attrib["dimensions"] if si_dims is None else si_dims
             meshes[name] = [
                 use.attrib["name"] for use in elem.findall("use-data")
             ]
@@ -122,19 +126,22 @@ def configToGraph(ast, args):
                 meshname = f"{name}-{mesh}"
                 provided = "provide" in use.attrib
                 if provided:
-                    addNode(participant, meshname, shape="cylinder", label=quote(mesh), color=color)
+                    label=mesh + ("" if mesh not in meshDims else f"<SUP><I>{meshDims[mesh]}D</I></SUP>")
+                    addNode(participant, meshname, shape="cylinder", label=f"<{label}>", color=color)
                 else:
                     pfrom = use.attrib["from"]
-                    addNode(participant, meshname, shape="cylinder", label=quote(f"{mesh}\nfrom {pfrom}"),
+                    label=f"<{mesh} from {pfrom}>"
+                    addNode(participant, meshname, shape="cylinder", label=label,
                             color=participantColor[pfrom], style="dashed"
                         )
             # provide-mesh
             for use in elem.findall("provide-mesh"):
                 mesh = use.attrib["name"]
                 meshname = f"{name}-{mesh}"
+                label=mesh + ("" if mesh not in meshDims else f"<SUP><I>{meshDims[mesh]}D</I></SUP>" )
                 if isTrue(use.attrib.get("dynamic", "no")):
                     mesh += "\ndynamic"
-                addNode(participant, meshname, shape="cylinder", label=quote(mesh), color=color)
+                addNode(participant, meshname, shape="cylinder", label=f"<{label}>", color=color)
             # receive-mesh
             for use in elem.findall("receive-mesh"):
                 mesh = use.attrib["name"]
