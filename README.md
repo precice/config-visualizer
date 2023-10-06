@@ -32,6 +32,11 @@ Execute the following command to print some help on it:
 precice-config-visualizer --help
 ```
 
+Alternatively open the GUI:
+```
+precice-config-visualizer-gui
+```
+
 ## Functionalities
 
 The tool transforms the xml configuration file into a dot graph file.
@@ -87,3 +92,17 @@ This code accepts several inputs seen below. These inputs can be accepted at sta
   --no-colors           
   ```
           Disable colors in the output.
+
+## GUI
+
+The tool ships with a GUI wrapper of the above.
+
+You can launch the gui as such and then open a configuration file
+```
+precice-config-visualizer-gui
+```
+
+Or pass the file directly as an argument
+```
+precice-config-visualizer-gui <precice config filename>
+```
