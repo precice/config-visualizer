@@ -66,9 +66,19 @@ def getParticipantColor(solverinterface, blackOnly=False):
 
 def configToGraph(ast, args):
     assert(ast.tag == "precice-configuration")
+
     solverinterfaces = ast.findall("solver-interface")
-    assert(len(solverinterfaces) == 1)
-    si = solverinterfaces[0]
+    precice_version = -1
+
+    if(len(solverinterfaces) == 1):
+        precice_version = 2
+    elif(len(solverinterfaces) == 0):
+        precice_version = 3
+
+    if(precice_version == 2):
+        root = solverinterfaces[0]
+    elif(precice_version == 3):
+        root = ast
 
     g = pydot.Graph(
         layout="dot",
@@ -85,9 +95,9 @@ def configToGraph(ast, args):
     cplCluster = pydot.Cluster("cpl", label=quote("Coupling Schemes"))
     g.add_subgraph(cplCluster)
 
-    participantColor = getParticipantColor(si, args.no_colors)
+    participantColor = getParticipantColor(root, args.no_colors)
 
-    for elem in si.iterchildren():
+    for elem in root.iterchildren():
         if (elem.tag.startswith("data")):
             kind = elem.tag[elem.tag.find(":")+1:]
             name = elem.attrib["name"]
