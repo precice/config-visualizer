@@ -101,7 +101,7 @@ class ConfigVisualizerWindow(Gtk.Window):
 
     def reload(self):
         if self._filename is None:
-            self.dotwidget.set_dotcode("")
+            self.dotwidget.set_dotcode(b"")
             return
 
         def getVisibilty(cb):
