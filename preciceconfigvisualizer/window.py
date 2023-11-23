@@ -8,14 +8,24 @@ import cairo
 from math import ceil
 
 def makeVisibilityCombobox(callback, withMerged = True):
-        cb = Gtk.ComboBoxText()
-        cb.append_text("Show")
-        if withMerged:
-            cb.append_text("Merge")
-        cb.append_text("Hide")
-        cb.set_active(0)
-        cb.connect("changed", callback)
-        return cb
+    cb = Gtk.ComboBoxText()
+    cb.append_text("Show")
+    if withMerged:
+        cb.append_text("Merge")
+    cb.append_text("Hide")
+    cb.set_active(0)
+    cb.connect("changed", callback)
+    return cb
+
+
+def set_active_by_value(combobox, value):
+    model = combobox.get_model()
+    for index, row in enumerate(model):
+        if row[0] == value:
+            combobox.set_active(index)
+            return
+    assert false
+
 
 class ConfigVisualizerWindow(Gtk.Window):
 
@@ -44,22 +54,39 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.top.insert(Gtk.SeparatorToolItem(), -1)
         self.top.insert(self.tool_refresh, -1)
 
+        self.settings = Gtk.Box(spacing=4)
+        self.box.pack_start(self.settings, False, False, 0)
+
         self.dotwidget = xdot.ui.DotWidget()
-        self.dotwidget.connect("error", lambda e, m: self.error_dialog(m))
+        self.dotwidget.connect("error", self.on_dot_error)
         self.box.pack_start(self.dotwidget, True, True, 0)
 
-        self.bottom = Gtk.Box(spacing=4)
-        self.box.pack_start(self.bottom, False, False, 0)
+        self.error_bar = Gtk.Label()
+        self.box.pack_start(self.error_bar, False, False, 0)
 
+        # Presets
+        presets = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        presets.pack_start(Gtk.Label(), True, True, 0)
+        for label in ("All", "Dataflow", "Coupling"):
+            button = Gtk.Button.new_with_label(label)
+            button.connect("clicked", self.on_preset, label)
+            presets.pack_start(button, True, True, 0)
+
+        # Settings
         self.data_access = makeVisibilityCombobox(self.on_option_change);
         self.data_exchange = makeVisibilityCombobox(self.on_option_change);
         self.communicators = makeVisibilityCombobox(self.on_option_change);
         self.cplschemes = makeVisibilityCombobox(self.on_option_change);
+
         # TODO add toogles
         #self.watchpoints = makeVisibilityCombobox(self.on_option_change,False);
         #self.exporters = makeVisibilityCombobox(self.on_option_change,False);
 
         optionsRow = [
+            Gtk.Label(),
+            Gtk.Label(label="Presets"),
+            presets,
+            Gtk.Separator(),
             Gtk.Label(label="Data access"),
             self.data_access,
             Gtk.Separator(),
@@ -77,9 +104,11 @@ class ConfigVisualizerWindow(Gtk.Window):
             #Gtk.Separator(),
             #Gtk.Label(label="Exporters"),
             #self.exporters,
+            Gtk.Label(),
         ]
         for x in optionsRow:
-            self.bottom.pack_start(x, False, False, 0)
+            self.settings.pack_start(x, False, False, 2)
+
         self.show_all()
         self.reload()
         self.monitor()
@@ -101,6 +130,7 @@ class ConfigVisualizerWindow(Gtk.Window):
 
     def reload(self):
         if self._filename is None:
+            self.error_bar.set_visible(False)
             self.dotwidget.set_dotcode(b"")
             return
 
@@ -121,6 +151,7 @@ class ConfigVisualizerWindow(Gtk.Window):
         )
 
         dot = configFileToDotCode(self._filename, args)
+        self.error_bar.set_visible(False)
         self.dotwidget.set_dotcode(dot.encode())
 
     def on_open(self, caller):
@@ -192,3 +223,24 @@ class ConfigVisualizerWindow(Gtk.Window):
 
     def on_option_change(self, caller):
         self.reload()
+
+    def on_preset(self, caller, label):
+        if label == "All":
+            set_active_by_value(self.data_access, "Show")
+            set_active_by_value(self.data_exchange, "Show")
+            set_active_by_value(self.communicators, "Show")
+            set_active_by_value(self.cplschemes, "Show")
+        elif label == "Dataflow":
+            set_active_by_value(self.data_access, "Show")
+            set_active_by_value(self.data_exchange, "Show")
+            set_active_by_value(self.communicators, "Hide")
+            set_active_by_value(self.cplschemes, "Hide")
+        elif label == "Coupling":
+            set_active_by_value(self.data_access, "Merge")
+            set_active_by_value(self.data_exchange, "Merge")
+            set_active_by_value(self.communicators, "Hide")
+            set_active_by_value(self.cplschemes, "Show")
+
+    def on_dot_error(self, caller, message):
+        self.error_bar.set_visible(True)
+        self.error_bar.set_label(f"Error: {message}")
