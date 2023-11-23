@@ -7,6 +7,8 @@ from preciceconfigvisualizer.common import configFileToDotCode
 import cairo
 from math import ceil
 
+PRECICE_SUPPORT_URI = "https://precice.org/community-support-precice.html"
+
 def makeVisibilityCombobox(callback, withMerged = True):
     cb = Gtk.ComboBoxText()
     cb.append_text("Show")
@@ -37,8 +39,12 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(self.box)
 
-        self.top = Gtk.Toolbar()
-        self.box.pack_start(self.top, False, False, 0)
+        # Toolbar
+
+        self.top = Gtk.Box(spacing=4)
+        self.box.pack_start(self.top, False, False, 2)
+
+        self.toolbar = Gtk.Toolbar()
         self.tool_open=Gtk.ToolButton(stock_id=Gtk.STOCK_OPEN)
         self.tool_open.connect("clicked", self.on_open)
         self.tool_save=Gtk.ToolButton(stock_id=Gtk.STOCK_SAVE_AS)
@@ -48,12 +54,18 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.tool_refresh=Gtk.ToggleToolButton(stock_id=Gtk.STOCK_REFRESH, active=True)
         self.tool_refresh.connect("clicked", self.on_toogle_refresh)
 
-        self.top.insert(self.tool_open, -1)
-        self.top.insert(Gtk.SeparatorToolItem(), -1)
-        self.top.insert(self.tool_save, -1)
-        self.top.insert(self.tool_copy, -1)
-        self.top.insert(Gtk.SeparatorToolItem(), -1)
-        self.top.insert(self.tool_refresh, -1)
+        self.toolbar.insert(self.tool_open, -1)
+        self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
+        self.toolbar.insert(self.tool_save, -1)
+        self.toolbar.insert(self.tool_copy, -1)
+        self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
+        self.toolbar.insert(self.tool_refresh, -1)
+        self.top.pack_start(self.toolbar, False, False, 2)
+
+        promotion = Gtk.LinkButton.new_with_label(PRECICE_SUPPORT_URI, "Support preCICE")
+        self.top.pack_end(promotion, False, False, 2)
+
+        # Settings row
 
         self.settings = Gtk.Box(spacing=4)
         self.box.pack_start(self.settings, False, False, 0)
