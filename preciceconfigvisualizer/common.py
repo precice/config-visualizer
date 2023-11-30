@@ -96,6 +96,7 @@ def configToGraph(ast, args):
     meshes = {}
     meshDims = {}
     participantClusterName = {}
+    participantCluster = {}
     m2nCluster = pydot.Cluster("m2n", label=quote("Communicators"))
     g.add_subgraph(m2nCluster)
     cplCluster = pydot.Cluster("cpl", label=quote("Coupling Schemes"))
@@ -118,6 +119,7 @@ def configToGraph(ast, args):
             name = elem.attrib["name"]
             participant = pydot.Cluster(name, label=quote(name), style="bold")
             participantClusterName[name] = participant.get_name()
+            participantCluster[name] = participant
             color = participantColor[name]
             addNode(participant, name, color=color, shape="doubleoctagon")
             # use-mesh
@@ -196,11 +198,11 @@ def configToGraph(ast, args):
             kind = elem.tag[elem.tag.find(":")+1:]
             pfrom = elem.attrib["from" if "from" in elem.attrib else "connector"]
             pto = elem.attrib["to" if "to" in elem.attrib else "acceptor"]
-            name = f"m2n-{pto}-{pfrom}"
+            m2nName = f"m2n-{pto}-{pfrom}"
             if args.communicators == "full":
-                addNode(m2nCluster, name, shape="component", label=quote(kind))
-                addEdge(g, name, pto,   lhead=participantClusterName[pto],   dir="both", color=participantColor[pto])
-                addEdge(g, name, pfrom, lhead=participantClusterName[pfrom], dir="both", color=participantColor[pfrom])
+                addNode(m2nCluster, m2nName, shape="component", label=quote(kind))
+                addEdge(g, m2nName, pto,   lhead=participantClusterName[pto],   dir="both", color=participantColor[pto])
+                addEdge(g, m2nName, pfrom, lhead=participantClusterName[pfrom], dir="both", color=participantColor[pfrom])
             if args.communicators == "merged":
                 addEdge(g, pfrom, pto, lhead=participantClusterName[pto], ltail=participantClusterName[pfrom], label=quote(kind), dir="both")
 
@@ -208,28 +210,56 @@ def configToGraph(ast, args):
         elif elem.tag.startswith("coupling-scheme"):
             kind = elem.tag[elem.tag.find(":")+1:]
             # Every cplscheme apart from multi
-            name = "-".join(["cpl", "multi"]+[e.attrib["name"] for e in elem.findall("participant")])
+            cplName = "-".join(["cpl", "multi"]+[e.attrib["name"] for e in elem.findall("participant")])
 
+            convFrom = None
             if kind == "multi":
                 if args.cplschemes != "hide":
-                    addNode(cplCluster, name, shape="component", label=quote(kind))
+                    addNode(cplCluster, cplName, shape="component", label=quote(kind))
                     for other in elem.findall("participant"):
                         thisName = other.attrib["name"]
-                        e = addEdge(g, name, thisName,  lhead=participantClusterName[thisName],   color=participantColor[thisName])
+                        e = addEdge(g, cplName, thisName,  lhead=participantClusterName[thisName],   color=participantColor[thisName])
                         if other.get("control"):
                             e.set_taillabel("Controller")
+                            convFrom = thisName
+                else:
+                    convFrom = [p.attrib["name"] for p in elem.findall("participant") if p.get("control", False)][0]
+
             else:
                 # Every cplscheme apart from multi
                 first =  elem.find("participants").attrib["first"]
                 second = elem.find("participants").attrib["second"]
-                name = f"cpl-{first}-{second}"
+                convFrom = second
+                cplName = f"cpl-{first}-{second}"
 
                 if args.cplschemes == "full":
-                    addNode(cplCluster, name, shape="component", label=quote(kind))
-                    addEdge(g, name, first,  lhead=participantClusterName[first],  taillabel=quote("first"),  color=participantColor[first])
-                    addEdge(g, name, second, lhead=participantClusterName[second], taillabel=quote("second"), color=participantColor[second])
+                    addNode(cplCluster, cplName, shape="component", label=quote(kind))
+                    addEdge(g, cplName, first,  lhead=participantClusterName[first],  taillabel=quote("first"),  color=participantColor[first])
+                    addEdge(g, cplName, second, lhead=participantClusterName[second], taillabel=quote("second"), color=participantColor[second])
                 elif args.cplschemes == "merged":
                     addUniqueEdge(g, first, second, dir="both", lhead=participantClusterName[first],  headlabel=quote("first"), ltail=participantClusterName[second], taillabel=quote("second"), label=quote(kind))
+
+            # Convergence measures
+            convs = [e for e in elem if e.tag.endswith("-convergence-measure")]
+            if convs:
+                convName = f"{convFrom}-conv"
+                addNode(participantCluster[convFrom], convName, shape="diamond", label=quote("Convergence"))
+                for conv in convs:
+                    mesh = conv.attrib["mesh"]
+                    data = conv.attrib["data"]
+                    addEdge(g, f"{convFrom}-{mesh}", convName, label=quote(data))
+
+            # Acceleration
+            accelerations = [e for e in elem if e.tag.startswith("acceleration")]
+            acceleration = accelerations[0] if accelerations else None
+            if acceleration is not None:
+                accelName = f"{convFrom}-accel"
+                accelKind = acceleration.tag.split(":")[1]
+                addNode(participantCluster[convFrom], accelName, shape="cds", label=quote(accelKind))
+                for d in acceleration.findall("data"):
+                    mesh = d.attrib["mesh"]
+                    data = d.attrib["name"]
+                    addEdge(g, f"{convFrom}-{mesh}", accelName, label=quote(data))
 
             # exchange tags
             # This is indepedant of the above
