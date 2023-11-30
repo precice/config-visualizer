@@ -34,7 +34,7 @@ class ConfigVisualizerWindow(Gtk.Window):
     def __init__(self, filename=None):
         self._filename = filename;
         super().__init__(title="preCICE config visualizer")
-        self.set_default_size(500, 300)
+        self.set_default_size(700, 700)
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(self.box)
