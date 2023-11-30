@@ -144,6 +144,7 @@ class ConfigVisualizerWindow(Gtk.Window):
     def reload(self):
         if self._filename is None:
             self.error_bar.set_visible(False)
+            self.dotcode = ""
             self.dotwidget.set_dotcode(b"")
             return
 
@@ -165,6 +166,7 @@ class ConfigVisualizerWindow(Gtk.Window):
 
         dot = configFileToDotCode(self._filename, args)
         self.error_bar.set_visible(False)
+        self.dotcode = dot.encode()
         self.dotwidget.set_dotcode(dot.encode())
 
     def on_open(self, caller):
@@ -204,7 +206,7 @@ class ConfigVisualizerWindow(Gtk.Window):
 
     def on_export(self, caller):
         dialog = Gtk.FileChooserDialog(
-            "Save As Image",
+            "Export as",
             None,
             Gtk.FileChooserAction.SAVE,
             (
@@ -213,22 +215,42 @@ class ConfigVisualizerWindow(Gtk.Window):
             )
         )
 
-        filter_image = Gtk.FileFilter()
-        filter_image.set_name("PNG images")
-        filter_image.add_mime_type("image/png")
-        dialog.add_filter(filter_image)
+        png_filter = Gtk.FileFilter()
+        png_filter.set_name("PNG images")
+        png_filter.add_mime_type("image/png")
+        dialog.add_filter(png_filter)
+        dot_filter = Gtk.FileFilter()
+        dot_filter.set_name("DOT graphs")
+        dot_filter.add_mime_type("text/vnd.graphviz")
+        dot_filter.add_pattern("*.gv")
+        dot_filter.add_pattern("*.dot")
+        dialog.add_filter(dot_filter)
 
         response = dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if response != Gtk.ResponseType.OK:
+            dialog.destroy()
+        else:
             filename = dialog.get_filename()
+            selection = dialog.get_filter()
+            dialog.destroy()
 
-            width, height = map(ceil, self.dotwidget.graph.get_size())
-            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-            ctx = cairo.Context(surface)
-            self.dotwidget.graph.draw(ctx)
-            surface.write_to_png(filename)
+            if selection == png_filter:
+                self.export_png(filename)
+            elif selection == dot_filter:
+                self.export_dot(filename)
+            else:
+                print("Unknown export type")
 
-        dialog.destroy()
+    def export_png(self, filename):
+        width, height = map(ceil, self.dotwidget.graph.get_size())
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        ctx = cairo.Context(surface)
+        self.dotwidget.graph.draw(ctx)
+        surface.write_to_png(filename)
+
+    def export_dot(self, filename):
+        with open(filename, "wb") as f:
+            f.write(self.dotcode)
 
     def on_toogle_refresh(self, caller):
         if self.tool_refresh.get_active():
