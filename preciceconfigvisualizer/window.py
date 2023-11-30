@@ -46,12 +46,16 @@ class ConfigVisualizerWindow(Gtk.Window):
 
         self.toolbar = Gtk.Toolbar()
         self.tool_open=Gtk.ToolButton(stock_id=Gtk.STOCK_OPEN)
+        self.tool_open.set_tooltip_text("Open a configuration")
         self.tool_open.connect("clicked", self.on_open)
         self.tool_save=Gtk.ToolButton(stock_id=Gtk.STOCK_SAVE_AS)
+        self.tool_save.set_tooltip_text("Save as")
         self.tool_save.connect("clicked", self.on_export)
         self.tool_copy=Gtk.ToolButton(stock_id=Gtk.STOCK_COPY)
+        self.tool_copy.set_tooltip_text("Copy as image to clipboard")
         self.tool_copy.connect("clicked", self.on_copy)
         self.tool_refresh=Gtk.ToggleToolButton(stock_id=Gtk.STOCK_REFRESH, active=True)
+        self.tool_refresh.set_tooltip_text("Reload on file-change")
         self.tool_refresh.connect("clicked", self.on_toogle_refresh)
 
         self.toolbar.insert(self.tool_open, -1)
