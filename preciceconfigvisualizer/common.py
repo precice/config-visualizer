@@ -229,7 +229,7 @@ def configToGraph(ast, args):
                     addEdge(g, name, first,  lhead=participantClusterName[first],  taillabel=quote("first"),  color=participantColor[first])
                     addEdge(g, name, second, lhead=participantClusterName[second], taillabel=quote("second"), color=participantColor[second])
                 elif args.cplschemes == "merged":
-                    addUniqueEdge(g, first, second, dir="both", lhead=participantClusterName[first],  headlabel=quote("first"), ltail=participantClusterName[second], taillabel=quote("second"), label=quote(kind))
+                    addUniqueEdge(g, first, second, dir="both", taillabel=quote("first"), headlabel=quote("second"), label=quote(kind))
 
             # exchange tags
             # This is indepedant of the above
