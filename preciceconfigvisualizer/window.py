@@ -274,16 +274,19 @@ class ConfigVisualizerWindow(Gtk.Window):
             set_active_by_value(self.data_exchange, "Show")
             set_active_by_value(self.communicators, "Show")
             set_active_by_value(self.cplschemes, "Show")
+            set_active_by_value(self.mappings, "Show")
         elif label == "Dataflow":
             set_active_by_value(self.data_access, "Show")
             set_active_by_value(self.data_exchange, "Show")
             set_active_by_value(self.communicators, "Hide")
             set_active_by_value(self.cplschemes, "Hide")
+            set_active_by_value(self.mappings, "Show")
         elif label == "Coupling":
             set_active_by_value(self.data_access, "Merge")
             set_active_by_value(self.data_exchange, "Merge")
             set_active_by_value(self.communicators, "Hide")
             set_active_by_value(self.cplschemes, "Show")
+            set_active_by_value(self.mappings, "Merge")
 
     def on_dot_error(self, caller, message):
         self.error_bar.set_visible(True)
