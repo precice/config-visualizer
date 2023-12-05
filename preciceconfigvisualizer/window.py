@@ -36,8 +36,12 @@ class ConfigVisualizerWindow(Gtk.Window):
         super().__init__(title="preCICE config visualizer")
         self.set_default_size(700, 700)
 
+        # Main dot widget created here to connect signals
+        self.dotwidget = xdot.ui.DotWidget()
+
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(self.box)
+
 
         # Toolbar
 
@@ -58,12 +62,30 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.tool_refresh.set_tooltip_text("Reload on file-change")
         self.tool_refresh.connect("clicked", self.on_toogle_refresh)
 
+        self.tool_zoom_in=Gtk.ToolButton(stock_id=Gtk.STOCK_ZOOM_IN)
+        self.tool_zoom_in.set_tooltip_text("Zoom in")
+        self.tool_zoom_in.connect("clicked", self.dotwidget.on_zoom_in)
+        self.tool_zoom_out=Gtk.ToolButton(stock_id=Gtk.STOCK_ZOOM_OUT)
+        self.tool_zoom_out.set_tooltip_text("Zoom out")
+        self.tool_zoom_out.connect("clicked", self.dotwidget.on_zoom_out)
+        self.tool_zoom_fit=Gtk.ToolButton(stock_id=Gtk.STOCK_ZOOM_FIT)
+        self.tool_zoom_fit.set_tooltip_text("Zoom to fit window")
+        self.tool_zoom_fit.connect("clicked", self.dotwidget.on_zoom_fit)
+        self.tool_zoom_100=Gtk.ToolButton(stock_id=Gtk.STOCK_ZOOM_100)
+        self.tool_zoom_100.set_tooltip_text("Zoom to 100%")
+        self.tool_zoom_100.connect("clicked", self.dotwidget.on_zoom_100)
+
         self.toolbar.insert(self.tool_open, -1)
         self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
         self.toolbar.insert(self.tool_save, -1)
         self.toolbar.insert(self.tool_copy, -1)
         self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
         self.toolbar.insert(self.tool_refresh, -1)
+        self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
+        self.toolbar.insert(self.tool_zoom_in, -1)
+        self.toolbar.insert(self.tool_zoom_out, -1)
+        self.toolbar.insert(self.tool_zoom_fit, -1)
+        self.toolbar.insert(self.tool_zoom_100, -1)
         self.top.pack_start(self.toolbar, False, False, 2)
 
         promotion = Gtk.LinkButton.new_with_label(PRECICE_SUPPORT_URI, "Support preCICE")
@@ -74,7 +96,6 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.settings = Gtk.Box(spacing=4)
         self.box.pack_start(self.settings, False, False, 0)
 
-        self.dotwidget = xdot.ui.DotWidget()
         self.dotwidget.connect("error", self.on_dot_error)
         self.box.pack_start(self.dotwidget, True, True, 0)
 
