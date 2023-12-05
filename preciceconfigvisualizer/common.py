@@ -211,13 +211,22 @@ def configToGraph(ast, args):
             name = "-".join(["cpl", "multi"]+[e.attrib["name"] for e in elem.findall("participant")])
 
             if kind == "multi":
-                if args.cplschemes != "hide":
+                if args.cplschemes == "full":
                     addNode(cplCluster, name, shape="component", label=quote(kind))
                     for other in elem.findall("participant"):
                         thisName = other.attrib["name"]
                         e = addEdge(g, name, thisName,  lhead=participantClusterName[thisName],   color=participantColor[thisName])
                         if other.get("control"):
                             e.set_taillabel("Controller")
+                elif args.cplschemes == "merged":
+                    addNode(g, name, shape="circle", tooltip=quote(kind), label=quote(""))
+                    for other in elem.findall("participant"):
+                        thisName = other.attrib["name"]
+                        e = addEdge(g, name, thisName)
+                        if other.get("control"):
+                            e.set_style("bold")
+                            e.set_tooltip("Controller")
+
             else:
                 # Every cplscheme apart from multi
                 first =  elem.find("participants").attrib["first"]
