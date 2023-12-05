@@ -52,6 +52,14 @@ def addUniqueEdge(g, src, dst, **attrs):
     return e
 
 
+def getEdge(g, src, dst):
+    for e in g.get_edge_list():
+        es, ed = e.get_source().strip('"'), e.get_destination().strip('"')
+        if es == src and ed == dst:
+            return e
+    return None
+
+
 def getParticipantNames(solverinterface):
     return [ p.attrib["name"] for p in solverinterface.findall("participant") ]
 
@@ -154,19 +162,31 @@ def configToGraph(ast, args):
             # read-data
             for read in elem.findall("read-data"):
                 mesh = read.attrib["mesh"]
+                meshNode = f"{name}-{mesh}"
                 data = read.attrib["name"]
                 if args.data_access == "full":
-                    addEdge(participant, f"{name}-{mesh}", name, label=quote(data), tooltip=dataType[data], color=color)
+                    addEdge(participant, meshNode, name, label=quote(data), tooltip=dataType[data], color=color)
                 elif args.data_access == "merged":
-                    addUniqueEdge(participant, f"{name}-{mesh}", name)
+                    reversed = getEdge(participant, name, meshNode)
+                    if (reversed is None):
+                        addUniqueEdge(participant, meshNode, name)
+                    else:
+                        reversed.set_dir("both")
             # write-data
             for write in elem.findall("write-data"):
-                mesh = write.attrib["mesh"]
-                data = write.attrib["name"]
+                mesh = read.attrib["mesh"]
+                meshNode = f"{name}-{mesh}"
+                data = read.attrib["name"]
                 if args.data_access == "full":
-                    addEdge(participant, name, f"{name}-{mesh}", label=quote(data), tooltip=dataType[data], color=color)
+                    addEdge(participant, name, meshNode, label=quote(data), tooltip=dataType[data], color=color)
                 elif args.data_access == "merged":
-                    addUniqueEdge(participant, name, f"{name}-{mesh}")
+                    reversed = getEdge(participant, meshNode, name)
+                    if (reversed is None):
+                        addUniqueEdge(participant, name, meshNode, color=color)
+                    else:
+                        reversed.set_dir("both")
+
+
             # watchpoint
             for watchpoint in elem.findall("watch-point"):
                 wpmesh = watchpoint.attrib["mesh"]
@@ -185,30 +205,22 @@ def configToGraph(ast, args):
                 # register mappings
                 if child.tag.startswith("mapping:"):
                     mkind = child.tag[child.tag.find(":")+1:]
-                    mfrom = child.attrib["from"]
-                    mto = child.attrib["to"]
-                    mappings.append((mfrom, mto, mkind))
+                    mfrom = name + "-" + child.attrib["from"]
+                    mto = name + "-" + child.attrib["to"]
+                    # mappings.append((mfrom, mto, mkind))
+                    if args.mappings == "full":
+                        addEdge(participant, mfrom, mto, label=quote(mkind), color=color)
+                    elif args.mappings == "merged":
+                        e = getEdge(participant, mto, mfrom)
+                        if e is None:
+                            addEdge(participant, mfrom, mto, color=color)
+                        else:
+                            e.set_dir("both")
 
                 # master
                 if child.tag.startswith("master:"):
                     kind = child.tag[child.tag.find(":")+1:]
                     addNode(participant, name+kind, shape="component", label=quote(kind))
-
-            # handle mappings
-            if args.mappings == "full":
-                for mfrom, mto, mkind in mappings:
-                    addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", label=quote(mkind))
-            elif args.mappings == "merged":
-                connections = [(m[0], m[1]) for m in mappings]
-
-                while connections:
-                    mfrom, mto = connections.pop()
-                    reversed = (mto, mfrom)
-                    if reversed in connections:
-                        connections.remove(reversed)
-                        addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", dir="both")
-                    else:
-                        addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}")
 
             g.add_subgraph(participant)
         # m2n
