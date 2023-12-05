@@ -90,10 +90,11 @@ class ConfigVisualizerWindow(Gtk.Window):
             presets.pack_start(button, True, True, 0)
 
         # Settings
-        self.data_access = makeVisibilityCombobox(self.on_option_change);
-        self.data_exchange = makeVisibilityCombobox(self.on_option_change);
-        self.communicators = makeVisibilityCombobox(self.on_option_change);
-        self.cplschemes = makeVisibilityCombobox(self.on_option_change);
+        self.data_access = makeVisibilityCombobox(self.on_option_change)
+        self.data_exchange = makeVisibilityCombobox(self.on_option_change)
+        self.communicators = makeVisibilityCombobox(self.on_option_change)
+        self.cplschemes = makeVisibilityCombobox(self.on_option_change)
+        self.mappings = makeVisibilityCombobox(self.on_option_change)
 
         # TODO add toogles
         #self.watchpoints = makeVisibilityCombobox(self.on_option_change,False);
@@ -115,6 +116,9 @@ class ConfigVisualizerWindow(Gtk.Window):
             Gtk.Separator(),
             Gtk.Label(label="Couplig schemes"),
             self.cplschemes,
+            Gtk.Separator(),
+            Gtk.Label(label="Mappings"),
+            self.mappings,
             #Gtk.Separator(),
             #Gtk.Label(label="Watchpoints"),
             #self.watchpoints,
@@ -164,6 +168,7 @@ class ConfigVisualizerWindow(Gtk.Window):
             data_exchange=getVisibilty(self.data_exchange),
             communicators=getVisibilty(self.communicators),
             cplschemes=getVisibilty(self.cplschemes),
+            mappings=getVisibilty(self.mappings),
             no_watchpoints=False,
             no_colors=False,
         )

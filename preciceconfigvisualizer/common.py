@@ -3,6 +3,7 @@ import pydot
 import sys
 from itertools import cycle
 import types
+from collections import defaultdict
 
 if sys.version_info < (3, 6):
     raise RuntimeError(
@@ -179,17 +180,36 @@ def configToGraph(ast, args):
                     addEdge(participant, wpnode, name, color=color)
 
             # other children
+            mappings = []
             for child in elem.iterchildren():
-                # mapping
+                # register mappings
                 if child.tag.startswith("mapping:"):
                     mkind = child.tag[child.tag.find(":")+1:]
                     mfrom = child.attrib["from"]
                     mto = child.attrib["to"]
-                    addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", label=quote(mkind))
+                    mappings.append((mfrom, mto, mkind))
+
                 # master
                 if child.tag.startswith("master:"):
                     kind = child.tag[child.tag.find(":")+1:]
                     addNode(participant, name+kind, shape="component", label=quote(kind))
+
+            # handle mappings
+            if args.mappings == "full":
+                for mfrom, mto, mkind in mappings:
+                    addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", label=quote(mkind))
+            elif args.mappings == "merged":
+                connections = [(m[0], m[1]) for m in mappings]
+
+                while connections:
+                    mfrom, mto = connections.pop()
+                    reversed = (mto, mfrom)
+                    if reversed in connections:
+                        connections.remove(reversed)
+                        addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}", dir="both")
+                    else:
+                        addEdge(participant, f"{name}-{mfrom}", f"{name}-{mto}")
+
             g.add_subgraph(participant)
         # m2n
         elif elem.tag.startswith("m2n"):
