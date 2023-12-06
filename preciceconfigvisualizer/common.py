@@ -100,6 +100,7 @@ def configToGraph(ast, args):
         overlap="scale",
         compound=True,
         rankdir="LR",
+        margin=args.margin,
     )
     dataType = {}
     meshes = {}

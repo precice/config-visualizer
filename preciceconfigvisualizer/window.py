@@ -117,6 +117,9 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.cplschemes = makeVisibilityCombobox(self.on_option_change)
         self.mappings = makeVisibilityCombobox(self.on_option_change)
 
+        self.margin = Gtk.SpinButton.new_with_range(8, 100, 2)
+        self.margin.connect("changed", self.on_option_change)
+
         # TODO add toogles
         #self.watchpoints = makeVisibilityCombobox(self.on_option_change,False);
         #self.exporters = makeVisibilityCombobox(self.on_option_change,False);
@@ -140,6 +143,9 @@ class ConfigVisualizerWindow(Gtk.Window):
             Gtk.Separator(),
             Gtk.Label(label="Mappings"),
             self.mappings,
+            Gtk.Separator(),
+            Gtk.Label(label="Margin"),
+            self.margin,
             #Gtk.Separator(),
             #Gtk.Label(label="Watchpoints"),
             #self.watchpoints,
@@ -192,6 +198,7 @@ class ConfigVisualizerWindow(Gtk.Window):
             mappings=getVisibilty(self.mappings),
             no_watchpoints=False,
             no_colors=False,
+            margin=self.margin.get_value(),
         )
 
         dot = configFileToDotCode(self._filename, args)
