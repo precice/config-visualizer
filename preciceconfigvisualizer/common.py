@@ -279,11 +279,14 @@ def configToGraph(ast, args):
                 data = exchange.attrib["data"]
                 pfrom = exchange.attrib["from"]
                 pto = exchange.attrib["to"]
+                init = isTrue(exchange.get("initialize", "no"))
                 withSubsteps = isTrue(exchange.get("substeps", "no"))
                 if args.data_exchange == "full":
                     pcolor = participantColor[pfrom]
+                    style = "bold" if init else ""
+                    tooltip = dataType[data] + (" initialized" if init else "")
                     color = f"{pcolor}:invis:{pcolor}" if withSubsteps else pcolor
-                    addEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", label=quote(data), tooltip=dataType[data], color=color)
+                    addEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", label=quote(data), tooltip=tooltip, color=color, style=style)
                 elif args.data_exchange == "merged":
                     addUniqueEdge(g, f"{pfrom}-{mesh}", f"{pto}-{mesh}", color=participantColor[pfrom])
 
