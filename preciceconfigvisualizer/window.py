@@ -61,6 +61,9 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.tool_refresh=Gtk.ToggleToolButton(stock_id=Gtk.STOCK_REFRESH, active=True)
         self.tool_refresh.set_tooltip_text("Reload on file-change")
         self.tool_refresh.connect("clicked", self.on_toogle_refresh)
+        self.tool_copy_path=Gtk.ToolButton(stock_id=Gtk.STOCK_INFO)
+        self.tool_copy_path.set_tooltip_text("Copy file path to clipboard")
+        self.tool_copy_path.connect("clicked", self.on_copy_path)
 
         self.tool_zoom_in=Gtk.ToolButton(stock_id=Gtk.STOCK_ZOOM_IN)
         self.tool_zoom_in.set_tooltip_text("Zoom in")
@@ -81,6 +84,8 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.toolbar.insert(self.tool_copy, -1)
         self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
         self.toolbar.insert(self.tool_refresh, -1)
+        self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
+        self.toolbar.insert(self.tool_copy_path, -1)
         self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
         self.toolbar.insert(self.tool_zoom_in, -1)
         self.toolbar.insert(self.tool_zoom_out, -1)
@@ -239,6 +244,11 @@ class ConfigVisualizerWindow(Gtk.Window):
 
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_image(pixbuf)
+        clipboard.store()
+
+    def on_copy_path(self, caller):
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(self._filename, -1)
         clipboard.store()
 
     def on_export(self, caller):
