@@ -175,9 +175,9 @@ def configToGraph(ast, args):
                         reversed.set_dir("both")
             # write-data
             for write in elem.findall("write-data"):
-                mesh = read.attrib["mesh"]
+                mesh = write.attrib["mesh"]
                 meshNode = f"{name}-{mesh}"
-                data = read.attrib["name"]
+                data = write.attrib["name"]
                 if args.data_access == "full":
                     addEdge(participant, name, meshNode, label=quote(data), tooltip=dataType[data], color=color)
                 elif args.data_access == "merged":
