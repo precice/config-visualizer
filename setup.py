@@ -1,4 +1,5 @@
 import os
+
 from setuptools import setup
 
 
@@ -7,23 +8,18 @@ def read(fname):
 
 
 setup(
-    name = "precice-config-visualizer",
-    version = "0.2.0",
-    author = "The preCICE Developers",
-    author_email = "info@precice.org",
-    description = "A tool for visualizing a preCICE configuration file as a dot file.",
-    license = "GPLv3",
-    #url = "http://packages.python.org/an_example_pypi_project",
-    packages=[ 'preciceconfigvisualizer'],
-    long_description=read('README.md'),
+    name="precice-config-visualizer",
+    version="0.2.0",
+    author="The preCICE Developers",
+    author_email="info@precice.org",
+    description="A tool for visualizing a preCICE configuration file as a dot file.",
+    license="GPLv3",
+    # url = "http://packages.python.org/an_example_pypi_project",
+    packages=["preciceconfigvisualizer"],
+    long_description=read("README.md"),
     python_requires=">=3.6",
-    install_requires = [
-        'lxml',
-        'pydot',
-        'xdot',
-        'PyGObject'
-    ],
-    classifiers = [
+    install_requires=["lxml", "pydot", "xdot", "PyGObject"],
+    classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 3 :: Only",
@@ -31,11 +27,8 @@ setup(
         "Topic :: Scientific/Engineering :: Visualization",
         "Topic :: Utilities",
     ],
-    scripts=[
-        'bin/precice-config-visualizer',
-        'bin/precice-config-visualizer-gui'
-    ],
-    data_files = [
-        ('share/applications', ['data/org.precice.configvisualizer.desktop']),
+    scripts=["bin/precice-config-visualizer", "bin/precice-config-visualizer-gui"],
+    data_files=[
+        ("share/applications", ["data/org.precice.configvisualizer.desktop"]),
     ],
 )
