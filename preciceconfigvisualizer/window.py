@@ -172,7 +172,7 @@ class ConfigVisualizerWindow(Gtk.Window):
             self.data_exchange,
             Gtk.Label(label="Communicators"),
             self.communicators,
-            Gtk.Label(label="Couplig schemes"),
+            Gtk.Label(label="Coupling schemes"),
             self.cplschemes,
             Gtk.Label(label="Mappings"),
             self.mappings,
