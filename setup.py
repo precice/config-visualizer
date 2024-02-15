@@ -27,7 +27,14 @@ setup(
         "Topic :: Scientific/Engineering :: Visualization",
         "Topic :: Utilities",
     ],
-    scripts=["bin/precice-config-visualizer", "bin/precice-config-visualizer-gui"],
+    entry_points={
+        "console_scripts": [
+            "precice-config-visualizer = preciceconfigvisualizer.cli:main"
+        ],
+        "gui_scripts": [
+            "precice-config-visualizer-gui = preciceconfigvisualizer.gui:main"
+        ],
+    },
     data_files=[
         ("share/applications", ["data/org.precice.configvisualizer.desktop"]),
     ],
