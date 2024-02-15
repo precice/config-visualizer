@@ -108,12 +108,12 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.box.pack_start(self.error_bar, False, False, 0)
 
         # Presets
-        presets = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        presets.pack_start(Gtk.Label(), True, True, 0)
+        presets = Gtk.HButtonBox()
+        presets.set_layout(Gtk.ButtonBoxStyle.EXPAND)
         for label in ("All", "Dataflow", "Coupling"):
             button = Gtk.Button.new_with_label(label)
             button.connect("clicked", self.on_preset, label)
-            presets.pack_start(button, True, True, 0)
+            presets.add(button)
 
         # Settings
         self.data_access = makeVisibilityCombobox(self.on_option_change)
