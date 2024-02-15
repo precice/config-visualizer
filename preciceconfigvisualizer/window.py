@@ -62,7 +62,7 @@ class ConfigVisualizerWindow(Gtk.Window):
     def __init__(self, filename=None):
         self._filename = filename;
         super().__init__(title="preCICE config visualizer")
-        self.set_default_size(700, 700)
+        self.set_default_size(900, 600) # 3:2
 
         # Main dot widget created here to connect signals
         self.dotwidget = xdot.ui.DotWidget()
