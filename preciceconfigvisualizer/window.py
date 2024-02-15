@@ -171,10 +171,10 @@ class ConfigVisualizerWindow(Gtk.Window):
         # self.watchpoints = makeVisibilityCombobox(self.on_option_change,False);
         # self.exporters = makeVisibilityCombobox(self.on_option_change,False);
 
-        optionsRow = [
+        optionsTop = [
             Gtk.Label(label="Presets"),
             presets,
-            Gtk.Label(),
+            Gtk.Label(),  # Visual space as separator
             Gtk.Label(label="Data access"),
             self.data_access,
             Gtk.Label(label="Data exchange"),
@@ -185,8 +185,6 @@ class ConfigVisualizerWindow(Gtk.Window):
             self.cplschemes,
             Gtk.Label(label="Mappings"),
             self.mappings,
-            Gtk.Label(label="Margin"),
-            self.margin,
             # Gtk.Separator(),
             # Gtk.Label(label="Watchpoints"),
             # self.watchpoints,
@@ -195,8 +193,17 @@ class ConfigVisualizerWindow(Gtk.Window):
             # self.exporters,
             # Gtk.Label(),
         ]
-        for x in optionsRow:
+
+        optionsBottom = [
+            Gtk.Label(label="Margin"),
+            self.margin,
+        ]
+
+        for x in optionsTop:
             self.settings.pack_start(x, False, False, 2)
+
+        for x in reversed(optionsBottom):
+            self.settings.pack_end(x, False, False, 2)
 
         self.show_all()
         self.reload()
