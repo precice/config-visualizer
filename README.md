@@ -53,43 +53,43 @@ Note: The `dot` tool is part of the [graphviz package](https://www.ubuntuupdates
 
 This code accepts several inputs seen below. These inputs can be accepted at startup or as stdin at runtime. Most of the optional parameters are used to hide or simplify the various relationships between participants, communicators and meshes---use them to adjust the fidelity of output as required for easier viewing.
 
- Note three available options `{full, merged, hide}`: 
+ Note three available options `{full, merged, hide}`:
  - `full` is the default setting, and displays all information
  - `merged` combines all the various connections between two nodes into a single connection
  - `hide` removes the information completely
 
   ### Positional Parameters
   ```
-  infile, 
+  infile,
   ```
           The XML configuration file. Omit to read from stdin.
 
 
   ### Optional Parameters
   ```
-  -o [OUTFILE], --outfile [OUTFILE] 
+  -o [OUTFILE], --outfile [OUTFILE]
   ```
           The resulting dot file. Omit to output to stdout.
 
   ```
-  --data-access {full,merged,hide} 
+  --data-access {full,merged,hide}
   ```
           Verbosity of the displayed read/write access between mesh and participant.
 
   ```
-  --data-exchange {full,merged,hide} 
+  --data-exchange {full,merged,hide}
   ```
           Verbosity of the displayed data exchange between meshes.
   ```
-  --communicators {full,merged,hide} 
+  --communicators {full,merged,hide}
   ```
           Verbosity of the displayed of communicators.
   ```
-  --cplschemes {full,merged,hide} 
+  --cplschemes {full,merged,hide}
   ```
           Verbosity of the displayed of coupling schemes.
   ```
-  --no-colors           
+  --no-colors
   ```
           Disable colors in the output.
 
