@@ -27,7 +27,7 @@ def parseXML(content):
 
 
 def parseXMLFile(file):
-    return parseXML(open("precice.xml", "rb").read())
+    return parseXML(open(file, "rb").read())
 
 
 def addNode(g, name, **attrs):
