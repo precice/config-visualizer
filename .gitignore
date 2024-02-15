@@ -9,3 +9,6 @@
 
 # pipx
 /build/
+
+# tox working dir
+/.tox/
