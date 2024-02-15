@@ -6,22 +6,11 @@ This readme describes the installation and various functionalities of this tool
 
 ## Installation options
 
-1.  Clone the repository and install locally as an editable package.
-    This allows you to simply pull in order to update.
+Install directly from the GitHub repository using [pipx](https://pipx.pypa.io/stable/).
 
-    ```
-    git clone https://github.com/precice/config-visualizer.git
-    pip3 install --user -e config-visualizer
-    ```
-
-2.  Install directly from the GitHub repository.
-    This version does not require `git`.
-
-    ```
-    pip3 install --user https://github.com/precice/config-visualizer/archive/master.zip
-    ```
-
-Note: You maybe need to add your user pip installations to your path to make the config visualizer findable, i.e. `export PATH=$PATH:$HOME/.local/bin`.
+```
+pipx install https://github.com/precice/config-visualizer/archive/master.zip
+```
 
 ## Usage
 
