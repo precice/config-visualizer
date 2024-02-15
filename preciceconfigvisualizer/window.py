@@ -141,6 +141,7 @@ class ConfigVisualizerWindow(Gtk.Window):
         self.box.pack_start(self.center, True, True, 0)
 
         self.settings = Gtk.VBox(spacing=4)
+        self.settings.set_property("margin", 4)
         self.center.pack1(self.settings, False, False)
         self.center.pack2(self.dotwidget, True, False)
 
