@@ -1,4 +1,5 @@
 import types
+import warnings
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, Gdk, Pango
@@ -66,6 +67,8 @@ class ConfigVisualizerWindow(Gtk.Window):
         # Main dot widget created here to connect signals
         self.dotwidget = xdot.ui.DotWidget()
         self.dotwidget.connect("error", self.on_dot_error)
+        # Silence the font warning
+        warnings.filterwarnings("ignore", message="Font family 'Times-Roman' is not available", append=True)
 
         self.box = Gtk.VBox()
         self.add(self.box)
