@@ -354,5 +354,5 @@ class ConfigVisualizerWindow(Gtk.Window):
             set_active_by_value(self.mappings, "Merge")
 
     def on_dot_error(self, caller, message):
-        self.error_bar.set_visible(True)
+        self.error_bar.set_visible(self._filename is not None)
         self.error_bar.set_label(f"Error: {message}")
