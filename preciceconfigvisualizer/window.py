@@ -1,7 +1,7 @@
 import types
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, Gdk
+from gi.repository import Gtk, Gio, Gdk, Pango
 import xdot.ui
 from preciceconfigvisualizer.common import configFileToDotCode
 import cairo
@@ -9,24 +9,51 @@ from math import ceil
 
 PRECICE_SUPPORT_URI = "https://precice.org/community-support-precice.html"
 
+
 def makeVisibilityCombobox(callback, withMerged = True):
-    cb = Gtk.ComboBoxText()
-    cb.append_text("Show")
-    if withMerged:
-        cb.append_text("Merge")
-    cb.append_text("Hide")
-    cb.set_active(0)
-    cb.connect("changed", callback)
-    return cb
+    group = Gtk.HButtonBox()
+    group.set_layout(Gtk.ButtonBoxStyle.EXPAND)
+
+    buttons = []
+
+    def on_button_toggled(caller, newState):
+        [b.handler_block_by_func(on_button_toggled) for b in buttons]
+
+        if not caller.get_active():
+            # prevent untoggling
+            caller.set_active(True)
+        else:
+            [b.set_active(False) for b in buttons if b != caller]
+
+        [b.handler_unblock_by_func(on_button_toggled) for b in buttons]
+
+        callback(caller)
+
+    DEFAULT = "Show"
+    for state in ["Show", "Merge", "Hide"]:
+        b = Gtk.ToggleButton(label=state)
+        b.set_active(state == DEFAULT)
+        b.connect("toggled", on_button_toggled, state)
+        buttons.append(b)
+        group.add(b)
+
+    return group
 
 
 def set_active_by_value(combobox, value):
-    model = combobox.get_model()
-    for index, row in enumerate(model):
-        if row[0] == value:
-            combobox.set_active(index)
-            return
-    assert false
+    for b in combobox.get_children():
+        assert isinstance(b, Gtk.ToggleButton)
+        if b.get_label() == value:
+            b.set_active(True)
+            break
+
+
+def get_active_value(combobox):
+    for b in combobox.get_children():
+        assert isinstance(b, Gtk.ToggleButton)
+        if b.get_active():
+            return b.get_label()
+    assert False, "Nothing is active"
 
 
 class ConfigVisualizerWindow(Gtk.Window):
@@ -38,10 +65,10 @@ class ConfigVisualizerWindow(Gtk.Window):
 
         # Main dot widget created here to connect signals
         self.dotwidget = xdot.ui.DotWidget()
+        self.dotwidget.connect("error", self.on_dot_error)
 
-        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box = Gtk.VBox()
         self.add(self.box)
-
 
         # Toolbar
 
@@ -96,13 +123,16 @@ class ConfigVisualizerWindow(Gtk.Window):
         promotion = Gtk.LinkButton.new_with_label(PRECICE_SUPPORT_URI, "Support preCICE")
         self.top.pack_end(promotion, False, False, 2)
 
-        # Settings row
+        # Central pane
 
-        self.settings = Gtk.Box(spacing=4)
-        self.box.pack_start(self.settings, False, False, 0)
+        self.center = Gtk.HPaned()
+        self.box.pack_start(self.center, True, True, 0)
 
-        self.dotwidget.connect("error", self.on_dot_error)
-        self.box.pack_start(self.dotwidget, True, True, 0)
+        self.settings = Gtk.VBox(spacing=4)
+        self.center.pack1(self.settings, False, False)
+        self.center.pack2(self.dotwidget, True, False)
+
+        # Bottom
 
         self.error_bar = Gtk.Label()
         self.box.pack_start(self.error_bar, False, False, 0)
@@ -130,25 +160,19 @@ class ConfigVisualizerWindow(Gtk.Window):
         #self.exporters = makeVisibilityCombobox(self.on_option_change,False);
 
         optionsRow = [
-            Gtk.Label(),
             Gtk.Label(label="Presets"),
             presets,
-            Gtk.Separator(),
+            Gtk.Label(),
             Gtk.Label(label="Data access"),
             self.data_access,
-            Gtk.Separator(),
             Gtk.Label(label="Data exchange"),
             self.data_exchange,
-            Gtk.Separator(),
             Gtk.Label(label="Communicators"),
             self.communicators,
-            Gtk.Separator(),
             Gtk.Label(label="Couplig schemes"),
             self.cplschemes,
-            Gtk.Separator(),
             Gtk.Label(label="Mappings"),
             self.mappings,
-            Gtk.Separator(),
             Gtk.Label(label="Margin"),
             self.margin,
             #Gtk.Separator(),
@@ -157,7 +181,7 @@ class ConfigVisualizerWindow(Gtk.Window):
             #Gtk.Separator(),
             #Gtk.Label(label="Exporters"),
             #self.exporters,
-            Gtk.Label(),
+            #Gtk.Label(),
         ]
         for x in optionsRow:
             self.settings.pack_start(x, False, False, 2)
@@ -193,7 +217,7 @@ class ConfigVisualizerWindow(Gtk.Window):
                 "Show" : 'full',
                 "Merge": 'merged',
                 "Hide": 'hide',
-            }[cb.get_active_text()]
+            }[get_active_value(cb)]
 
         args = types.SimpleNamespace(
             data_access=getVisibilty(self.data_access),
