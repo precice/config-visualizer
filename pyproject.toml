@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=41", "wheel", "setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name="precice-config-visualizer"
+dynamic = [ "version" ]
+dependencies = [
+    "lxml", "pydot", "xdot", "PyGObject"
+]
+requires-python = ">=3.8"
+authors = [
+    { name = "The preCICE Developers",  email="info@precice.org"}
+]
+maintainers = [
+    { name = "Frédéric Simonis",  email="frederic.simonis@ipvs.uni-stuttgart.de"}
+]
+description="A tool for visualizing a preCICE configuration file as a dot file."
+readme = "README.md"
+license={ text = "GPLv3" }
+keywords = [ "preCICE", "dot", "graphviz", "XML", "interactive", "configuration", "visualization" ]
+classifiers=[
+"Development Status :: 4 - Beta",
+"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+"Programming Language :: Python :: 3 :: Only",
+"Programming Language :: Python :: 3.8",
+"Topic :: Scientific/Engineering :: Visualization",
+"Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://precice.org"
+Documentation = "https://precice.org/tooling-config-visualization.html"
+Repository = "https://github.com/precice/config-visualizer.git"
+"Bug Tracker" = "https://github.com/precice/config-visualizer/issues"
+
+[project.scripts]
+precice-config-visualizer = "preciceconfigvisualizer.cli:main"
+
+[project.gui-scripts]
+precice-config-visualizer-gui = "preciceconfigvisualizer.gui:main"
+
+[tool.setuptools]
+data-files = { "share/applications" = ["data/org.precice.configvisualizer.desktop"] }
+packages=["preciceconfigvisualizer"]
+
+[tool.setuptools-git-versioning]
+enabled = true
