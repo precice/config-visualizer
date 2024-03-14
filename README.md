@@ -1,97 +1,57 @@
 # preCICE Config-Visualizer
 
-The `config-visualizer` is a tool meant to help visualize and debug precice configuration xml files. This tool produces a dot file as output, which visualizes the various communicators and meshes defined in the configuration file and the movement of data between them.
-
-This readme describes the installation and various functionalities of this tool
+The `config-visualizer` is a tool meant to help visualize and debug precice configuration xml files. This tool produces a dot file as output, which visualizes the various participants, communicators and meshes defined in the configuration file and the movement of data between them.
 
 ## Installation options
 
-Install directly from the GitHub repository using [pipx](https://pipx.pypa.io/stable/).
+Install directly from PyPi using [pipx](https://pipx.pypa.io/stable/) or via pip:
 
 ```
-pipx install https://github.com/precice/config-visualizer/archive/master.zip
+pipx install precice-config-visualizer
 ```
 
 ## Usage
 
-Run the tool directly from the command line.
+The config visualizer can be use via the CLI or the interactive GUI.
 
-Execute the following command to print some help on it:
+### GUI
+
+```
+precice-config-visualizer-gui [CONFIG-FILE]
+```
+
+You can launch the GUI directly from the command line.
+Passing the path to a configuration file is optional.
+All further adjustments are made directly in the GUI.
+
+### CLI
+
 ```
 precice-config-visualizer --help
+precice-config-visualizer [OPTIONS] [-o OUTFILE] [<CONFIG-FILE>]
 ```
 
-Alternatively open the GUI:
-```
-precice-config-visualizer-gui
-```
+The command line version of the tool transforms the XML configuration file into a dot graph file.
+This is especially useful if the output needs to be altered for various reasons.
+To edit the actual graph, displaying it using a dot viewer such as [xdot](https://pypi.org/project/xdot/) can be helpful.
 
-## Functionalities
+The tool reads from stdin if no configuration file is given as an argument and the output is printed to stdout if no output filename if specified using the `-o` option.
 
-The tool transforms the xml configuration file into a dot graph file.
-```
-precice-config-visualizer <precice config filename>
-```
+To generate `graph.dot` from `precice-config.xml` use:
 
-It is pipe-friendly, so it can be used in scripts etc:
 ```
-cat config.xml | precice-config-visualizer | dot -Tpdf > config.pdf
+precice-config-visualizer -o graph.dot precice-config.xml
 ```
 
-Note: The `dot` tool is part of the [graphviz package](https://www.ubuntuupdates.org/package/core/groovy/universe/base/graphviz).
+To `precice-config.xml` as PDF use:
 
-This code accepts several inputs seen below. These inputs can be accepted at startup or as stdin at runtime. Most of the optional parameters are used to hide or simplify the various relationships between participants, communicators and meshes---use them to adjust the fidelity of output as required for easier viewing.
-
- Note three available options `{full, merged, hide}`:
- - `full` is the default setting, and displays all information
- - `merged` combines all the various connections between two nodes into a single connection
- - `hide` removes the information completely
-
-  ### Positional Parameters
-  ```
-  infile,
-  ```
-          The XML configuration file. Omit to read from stdin.
-
-
-  ### Optional Parameters
-  ```
-  -o [OUTFILE], --outfile [OUTFILE]
-  ```
-          The resulting dot file. Omit to output to stdout.
-
-  ```
-  --data-access {full,merged,hide}
-  ```
-          Verbosity of the displayed read/write access between mesh and participant.
-
-  ```
-  --data-exchange {full,merged,hide}
-  ```
-          Verbosity of the displayed data exchange between meshes.
-  ```
-  --communicators {full,merged,hide}
-  ```
-          Verbosity of the displayed of communicators.
-  ```
-  --cplschemes {full,merged,hide}
-  ```
-          Verbosity of the displayed of coupling schemes.
-  ```
-  --no-colors
-  ```
-          Disable colors in the output.
-
-## GUI
-
-The tool ships with a GUI wrapper of the above.
-
-You can launch the gui as such and then open a configuration file
 ```
-precice-config-visualizer-gui
+precice-config-visualizer precice-config.xml | dot -Tpdf -o graph.pdf
 ```
 
-Or pass the file directly as an argument
+Further options can be used to control the output appearance. Some information can be turned off or merged.
+For a full list of options, run:
+
 ```
-precice-config-visualizer-gui <precice config filename>
+precice-config-visualizer --help
 ```
