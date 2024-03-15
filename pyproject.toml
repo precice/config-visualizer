@@ -41,8 +41,12 @@ precice-config-visualizer = "preciceconfigvisualizer.cli:main"
 precice-config-visualizer-gui = "preciceconfigvisualizer.gui:main"
 
 [tool.setuptools]
-data-files = { "share/applications" = ["data/org.precice.configvisualizer.desktop"] }
 packages=["preciceconfigvisualizer"]
+
+[tool.setuptools.data-files]
+"share/applications" = ["data/org.precice.config_visualizer.desktop"]
+"share/metainfo" = ["data/org.precice.config_visualizer.metainfo.xml"]
+"share/icons/hicolor/scalable/apps/" = ["data/org.precice.config_visualizer.svg"]
 
 [tool.setuptools-git-versioning]
 enabled = true

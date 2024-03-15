@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.precice.config_visualizer</id>
+
+  <name>preCICE Config Visualizer</name>
+  <summary>A visualizer for preCICE configuration files</summary>
+
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      The preCICE Config Visualizer visualizes preCICE configuration files as a graph.
+    </p>
+    <p>
+      This tool produces visual graph representation of the various participants, communicators and meshes defined in the setup and the movement of data between them.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">org.precice.config_visualizer.desktop</launchable>
+</component>
