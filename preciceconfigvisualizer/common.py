@@ -13,36 +13,36 @@ if sys.version_info < (3, 6):
     )
 
 
-def isTrue(text):
+def isTrue(text: str) -> bool:
     return text.lower() in ["yes", "1", "true", "on"]
 
 
-def quote(text):
+def quote(text: str) -> str:
     return f'"{text}"'
 
 
-def parseXML(content):
+def parseXML(content) -> etree._Element:
     p = etree.XMLParser(recover=True, remove_comments=True)
     return etree.fromstring(content, p)
 
 
-def parseXMLFile(file):
+def parseXMLFile(file: str) -> etree._Element:
     return parseXML(open(file, "rb").read())
 
 
-def addNode(g, name, **attrs):
+def addNode(g: pydot.Graph, name: str, **attrs) -> pydot.Node:
     n = pydot.Node(quote(name), **attrs)
     g.add_node(n)
     return n
 
 
-def addEdge(g, src, dst, **attrs):
+def addEdge(g: pydot.Graph, src: str, dst: str, **attrs) -> pydot.Edge:
     e = pydot.Edge(quote(src), quote(dst), **attrs)
     g.add_edge(e)
     return e
 
 
-def addUniqueEdge(g, src, dst, **attrs):
+def addUniqueEdge(g: pydot.Graph, src: str, dst: str, **attrs) -> pydot.Edge:
     for e in g.get_edge_list():
         es, ed = e.get_source().strip('"'), e.get_destination().strip('"')
         if es == src and ed == dst:
@@ -52,7 +52,7 @@ def addUniqueEdge(g, src, dst, **attrs):
     return e
 
 
-def getEdge(g, src, dst):
+def getEdge(g: pydot.Graph, src: str, dst: str) -> pydot.Edge | None:
     for e in g.get_edge_list():
         es, ed = e.get_source().strip('"'), e.get_destination().strip('"')
         if es == src and ed == dst:
@@ -60,11 +60,13 @@ def getEdge(g, src, dst):
     return None
 
 
-def getParticipantNames(solverinterface):
+def getParticipantNames(solverinterface: etree._Element) -> list[str]:
     return [p.attrib["name"] for p in solverinterface.findall("participant")]
 
 
-def getParticipantColor(solverinterface, blackOnly=False):
+def getParticipantColor(
+    solverinterface: str, blackOnly: bool = False
+) -> dict[str, str]:
     names = getParticipantNames(solverinterface)
     colors = None
     if blackOnly:
@@ -86,7 +88,7 @@ def getParticipantColor(solverinterface, blackOnly=False):
     return dict(zip(names, colors))
 
 
-def configToGraph(ast, args):
+def configToGraph(ast: etree._Element, args) -> pydot.Graph:
     assert ast.tag == "precice-configuration"
 
     solverinterfaces = ast.findall("solver-interface")
@@ -257,14 +259,12 @@ def configToGraph(ast, args):
                     addEdge(participant, wpnode, name, color=color)
 
             # other children
-            mappings = []
             for child in elem.iterchildren():
                 # register mappings
                 if child.tag.startswith("mapping:"):
                     mkind = child.tag[child.tag.find(":") + 1 :]
                     mfrom = name + "-" + child.attrib["from"]
                     mto = name + "-" + child.attrib["to"]
-                    # mappings.append((mfrom, mto, mkind))
                     if args.mappings == "full":
                         addEdge(
                             participant, mfrom, mto, label=quote(mkind), color=color
@@ -432,7 +432,7 @@ def readBinary(streamlike):
         return streamlike.read()
 
 
-def configFileToDotCode(filename, args):
+def configFileToDotCode(filename: str, args) -> str:
     xml = parseXML(readBinary(open(filename, "rb")))
     g = configToGraph(xml, args)
     return g.to_string()
