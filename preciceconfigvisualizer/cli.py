@@ -54,7 +54,7 @@ def parse_args():
         "--no-colors", action="store_true", help="Disable colors in the output."
     )
     parser.add_argument(
-        "--margin", default=8, type=int, help="Margin around cluster borders in points."
+        "--margin", default=0, type=int, help="Margin around cluster borders in points."
     )
     parser.add_argument("infile", type=str, help="The XML configuration file.")
     return parser.parse_args()
