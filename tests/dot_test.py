@@ -29,3 +29,8 @@ class DotTests(unittest.TestCase):
         self.assertIsNotNone(
             configFileToDotCode("samples/v3/solverdummy.xml", self.args)
         )
+
+    def test_v3_solverdummy(self):
+        self.assertIsNotNone(
+            configFileToDotCode("samples/v3/aste-tutorial.xml", self.args)
+        )

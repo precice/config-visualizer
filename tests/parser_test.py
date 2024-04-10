@@ -12,3 +12,6 @@ class ParseTests(unittest.TestCase):
 
     def test_v3_solverdummy(self):
         self.assertIsNotNone(parseXMLFile("samples/v3/solverdummy.xml"))
+
+    def test_v3_solverdummy(self):
+        self.assertIsNotNone(parseXMLFile("samples/v3/aste-tutorial.xml"))
