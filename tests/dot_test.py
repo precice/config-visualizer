@@ -1,36 +1,35 @@
 import types
-import unittest
+import pytest
+import glob
 
 from preciceconfigvisualizer.common import configFileToDotCode
 
+VISIBILITY = ["full", "merged", "none"]
+TOOGLED = [True, False]
+OUTPUT_CONFIGS = [
+    types.SimpleNamespace(
+        data_access=da,
+        data_exchange=de,
+        communicators=com,
+        cplschemes=cpl,
+        mappings=map,
+        no_watchpoints=watch,
+        no_colors=color,
+        margin=10,
+    )
+    for da in VISIBILITY
+    for de in VISIBILITY
+    for com in VISIBILITY
+    for cpl in VISIBILITY
+    for map in VISIBILITY
+    for watch in TOOGLED
+    for color in TOOGLED
+]
 
-class DotTests(unittest.TestCase):
-    def setUp(self):
-        self.args = types.SimpleNamespace(
-            data_access="full",
-            data_exchange="full",
-            communicators="full",
-            cplschemes="full",
-            mappings="full",
-            no_watchpoints=False,
-            no_colors=False,
-            margin=10,
-        )
 
-    def test_v2_solverdummy(self):
-        self.assertIsNotNone(
-            configFileToDotCode("samples/v2/solverdummy.xml", self.args)
-        )
-
-    def test_v2_generated(self):
-        self.assertIsNotNone(configFileToDotCode("samples/v2/generated.xml", self.args))
-
-    def test_v3_solverdummy(self):
-        self.assertIsNotNone(
-            configFileToDotCode("samples/v3/solverdummy.xml", self.args)
-        )
-
-    def test_v3_solverdummy(self):
-        self.assertIsNotNone(
-            configFileToDotCode("samples/v3/aste-tutorial.xml", self.args)
-        )
+@pytest.mark.parametrize(
+    "filename, args",
+    [(f, a) for f in glob.glob("samples/v*/*.xml") for a in OUTPUT_CONFIGS],
+)
+def test_dot_from_xml(filename, args):
+    assert configFileToDotCode(filename, args) is not None
