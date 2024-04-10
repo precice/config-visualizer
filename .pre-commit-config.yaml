@@ -8,11 +8,6 @@ repos:
   - id: mixed-line-ending
   - id: trailing-whitespace
   - id: end-of-file-fixer
-# isort for python imports
-- repo: https://github.com/pycqa/isort
-  rev: 5.12.0
-  hooks:
-    - id: isort
 # black repo for python formatting
 - repo: https://github.com/ambv/black
   rev: 22.12.0
