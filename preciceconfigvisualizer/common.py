@@ -1,16 +1,30 @@
 import sys
-import types
+from typing import Literal, TypedDict, Unpack
 from collections import defaultdict
 from itertools import cycle
 
 import pydot
 from lxml import etree
 
+
 if sys.version_info < (3, 6):
     raise RuntimeError(
         "This program requires python 3.6 or later but you attempted to run it"
         " with python {}.{}".format(sys.version_info.major.sys.version_info.minor)
     )
+
+VISIBILITY_TYPE = Literal["full", "merged", "hide"]
+
+
+class VisualizationParameters(TypedDict):
+    data_access: VISIBILITY_TYPE
+    data_exchange: VISIBILITY_TYPE
+    communicators: VISIBILITY_TYPE
+    cplschemes: VISIBILITY_TYPE
+    mappings: VISIBILITY_TYPE
+    watchpoints: bool
+    colors: bool
+    margin: int
 
 
 def isTrue(text: str) -> bool:
@@ -65,11 +79,11 @@ def getParticipantNames(solverinterface: etree._Element) -> list[str]:
 
 
 def getParticipantColor(
-    solverinterface: str, blackOnly: bool = False
+    solverinterface: str, use_colors: bool = False
 ) -> dict[str, str]:
     names = getParticipantNames(solverinterface)
     colors = None
-    if blackOnly:
+    if not use_colors:
         colors = cycle(["black"])
     else:
         colorblind = [
@@ -94,7 +108,20 @@ def findAllWithPrefix(e: etree._Element, prefix: str):
             yield child
 
 
-def configToGraph(ast: etree._Element, args) -> pydot.Graph:
+def configToGraph(
+    ast: etree._Element, **kwargs: Unpack[VisualizationParameters]
+) -> pydot.Graph:
+    data_access = kwargs.get("data_access", "full")
+    data_exchange = kwargs.get("data_exchange", "full")
+    communicators = kwargs.get("communicators", "full")
+    cplschemes = kwargs.get("cplschemes", "full")
+    mappings = kwargs.get("mappings", "full")
+
+    watchpoints = kwargs.get("watchpoints", True)
+    colors = kwargs.get("colors", True)
+
+    margin = kwargs.get("margin", 0)
+
     assert ast.tag == "precice-configuration"
 
     solverinterfaces = ast.findall("solver-interface")
@@ -119,7 +146,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
         overlap="scale",
         compound=True,
         rankdir="LR",
-        margin=args.margin,
+        margin=margin,
     )
     dataType = {}
     meshes = {}
@@ -130,7 +157,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
     cplCluster = pydot.Cluster("cpl", label=quote("Coupling Schemes"))
     g.add_subgraph(cplCluster)
 
-    participantColor = getParticipantColor(root, args.no_colors)
+    participantColor = getParticipantColor(root, colors)
 
     for elem in findAllWithPrefix(root, "data"):
         kind = elem.tag[elem.tag.find(":") + 1 :]
@@ -211,7 +238,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
             mesh = read.attrib["mesh"]
             meshNode = f"{name}-{mesh}"
             data = read.attrib["name"]
-            if args.data_access == "full":
+            if data_access == "full":
                 addEdge(
                     participant,
                     meshNode,
@@ -220,7 +247,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                     tooltip=dataType[data],
                     color=color,
                 )
-            elif args.data_access == "merged":
+            elif data_access == "merged":
                 reversed = getEdge(participant, name, meshNode)
                 if reversed is None:
                     addUniqueEdge(participant, meshNode, name)
@@ -231,7 +258,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
             mesh = write.attrib["mesh"]
             meshNode = f"{name}-{mesh}"
             data = write.attrib["name"]
-            if args.data_access == "full":
+            if data_access == "full":
                 addEdge(
                     participant,
                     name,
@@ -240,7 +267,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                     tooltip=dataType[data],
                     color=color,
                 )
-            elif args.data_access == "merged":
+            elif data_access == "merged":
                 reversed = getEdge(participant, meshNode, name)
                 if reversed is None:
                     addUniqueEdge(participant, name, meshNode, color=color)
@@ -252,7 +279,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
             wpmesh = watchpoint.attrib["mesh"]
             wpname = watchpoint.attrib["name"]
             wpcoord = watchpoint.attrib["coordinate"]
-            if not args.no_watchpoints:
+            if watchpoints:
                 wpnode = f"{name}-WP-{wpname}"
                 addNode(
                     participant,
@@ -270,9 +297,9 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                 mkind = child.tag[child.tag.find(":") + 1 :]
                 mfrom = name + "-" + child.attrib["from"]
                 mto = name + "-" + child.attrib["to"]
-                if args.mappings == "full":
+                if mappings == "full":
                     addEdge(participant, mfrom, mto, label=quote(mkind), color=color)
-                elif args.mappings == "merged":
+                elif mappings == "merged":
                     e = getEdge(participant, mto, mfrom)
                     if e is None:
                         addEdge(participant, mfrom, mto, color=color)
@@ -291,7 +318,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
         pfrom = elem.attrib["from" if "from" in elem.attrib else "connector"]
         pto = elem.attrib["to" if "to" in elem.attrib else "acceptor"]
         name = f"m2n-{pto}-{pfrom}"
-        if args.communicators == "full":
+        if communicators == "full":
             addNode(m2nCluster, name, shape="component", label=quote(kind))
             addEdge(
                 g,
@@ -309,7 +336,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                 dir="both",
                 color=participantColor[pfrom],
             )
-        if args.communicators == "merged":
+        if communicators == "merged":
             addEdge(
                 g,
                 pfrom,
@@ -328,7 +355,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
         )
 
         if kind == "multi":
-            if args.cplschemes == "full":
+            if cplschemes == "full":
                 addNode(cplCluster, name, shape="component", label=quote(kind))
                 for other in elem.findall("participant"):
                     thisName = other.attrib["name"]
@@ -341,7 +368,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                     )
                     if other.get("control"):
                         e.set_taillabel("Controller")
-            elif args.cplschemes == "merged":
+            elif cplschemes == "merged":
                 addNode(g, name, shape="circle", tooltip=quote(kind), label=quote(""))
                 for other in elem.findall("participant"):
                     thisName = other.attrib["name"]
@@ -356,7 +383,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
             second = elem.find("participants").attrib["second"]
             name = f"cpl-{first}-{second}"
 
-            if args.cplschemes == "full":
+            if cplschemes == "full":
                 addNode(cplCluster, name, shape="component", label=quote(kind))
                 addEdge(
                     g,
@@ -374,7 +401,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                     taillabel=quote("second"),
                     color=participantColor[second],
                 )
-            elif args.cplschemes == "merged":
+            elif cplschemes == "merged":
                 addUniqueEdge(
                     g,
                     first,
@@ -394,7 +421,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
             pto = exchange.attrib["to"]
             init = isTrue(exchange.get("initialize", "no"))
             withSubsteps = isTrue(exchange.get("substeps", "no"))
-            if args.data_exchange == "full":
+            if data_exchange == "full":
                 pcolor = participantColor[pfrom]
                 style = "bold" if init else ""
                 tooltip = dataType[data] + (" initialized" if init else "")
@@ -408,7 +435,7 @@ def configToGraph(ast: etree._Element, args) -> pydot.Graph:
                     color=color,
                     style=style,
                 )
-            elif args.data_exchange == "merged":
+            elif data_exchange == "merged":
                 addUniqueEdge(
                     g,
                     f"{pfrom}-{mesh}",
@@ -429,7 +456,9 @@ def readBinary(streamlike):
         return streamlike.read()
 
 
-def configFileToDotCode(filename: str, args) -> str:
+def configFileToDotCode(
+    filename: str, **kwargs: Unpack[VisualizationParameters]
+) -> str:
     xml = parseXML(readBinary(open(filename, "rb")))
-    g = configToGraph(xml, args)
+    g = configToGraph(xml, **kwargs)
     return g.to_string()

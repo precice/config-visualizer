@@ -241,18 +241,18 @@ class ConfigVisualizerWindow(Gtk.Window):
                 "Hide": "hide",
             }[get_active_value(cb)]
 
-        args = types.SimpleNamespace(
-            data_access=getVisibilty(self.data_access),
-            data_exchange=getVisibilty(self.data_exchange),
-            communicators=getVisibilty(self.communicators),
-            cplschemes=getVisibilty(self.cplschemes),
-            mappings=getVisibilty(self.mappings),
-            no_watchpoints=False,
-            no_colors=False,
-            margin=self.margin.get_value(),
-        )
+        args = {
+            "data_access": getVisibilty(self.data_access),
+            "data_exchange": getVisibilty(self.data_exchange),
+            "communicators": getVisibilty(self.communicators),
+            "cplschemes": getVisibilty(self.cplschemes),
+            "mappings": getVisibilty(self.mappings),
+            "watchpoints": True,
+            "colors": True,
+            "margin": self.margin.get_value(),
+        }
 
-        dot = configFileToDotCode(self._filename, args)
+        dot = configFileToDotCode(self._filename, **args)
         self.error_bar.set_visible(False)
         self.dotcode = dot.encode()
         self.dotwidget.set_dotcode(dot.encode())

@@ -48,10 +48,16 @@ def parse_args():
         help="Verbosity of the displayed of mappings.",
     )
     parser.add_argument(
-        "--no-watchpoints", action="store_true", help="Do not display watchpoints."
+        "--no-watchpoints",
+        action="store_false",
+        dest="watchpoints",
+        help="Do not display watchpoints.",
     )
     parser.add_argument(
-        "--no-colors", action="store_true", help="Disable colors in the output."
+        "--no-colors",
+        action="store_false",
+        dest="colors",
+        help="Disable colors in the output.",
     )
     parser.add_argument(
         "--margin", default=0, type=int, help="Margin around cluster borders in points."
@@ -62,7 +68,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    dot = configFileToDotCode(args.infile, args)
+    dot = configFileToDotCode(args.infile, **vars(args))
     args.outfile.write(dot)
 
 
