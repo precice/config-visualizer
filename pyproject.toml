@@ -37,6 +37,9 @@ Repository = "https://github.com/precice/config-visualizer.git"
 [project.scripts]
 precice-config-visualizer = "preciceconfigvisualizer.cli:main"
 
+[project.optional-dependencies]
+gui = [ "precice-config-visualizer-gui" ]
+
 [tool.setuptools]
 packages=["preciceconfigvisualizer"]
 

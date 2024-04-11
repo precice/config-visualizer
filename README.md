@@ -10,6 +10,12 @@ Install directly from PyPi using [pipx](https://pipx.pypa.io/stable/) or via pip
 pipx install precice-config-visualizer
 ```
 
+To also install [the GUI](https://pypi.org/project/precice-config-visualizer-gui/), run:
+
+```
+pipx install 'precice-config-visualizer[gui]'
+```
+
 ## Usage
 
 ```
