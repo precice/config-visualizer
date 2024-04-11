@@ -45,7 +45,7 @@ jobs:
         with:
           python-version: ${{ matrix.py }}
       - name: Install dependencies
-        run: sudo apt -yy update && sudo apt -yy install libgirepository1.0-dev build-essential libbz2-dev libreadline-dev libssl-dev zlib1g-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libcairo2-dev
+        run: sudo apt -yy update && sudo apt -yy install graphviz
       - name: Install tox
         run: python -m pip install tox-gh>=1.2
       - name: Setup test suite

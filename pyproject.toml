@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name="precice-config-visualizer"
 dynamic = [ "version" ]
 dependencies = [
-    "lxml", "pydot", "xdot", "PyGObject", "typing_extensions"
+    "lxml", "pydot", "typing_extensions"
 ]
 requires-python = ">=3.8"
 authors = [
@@ -18,7 +18,7 @@ maintainers = [
 description="A tool for visualizing a preCICE configuration file as a dot file."
 readme = "README.md"
 license={ text = "GPLv3" }
-keywords = [ "preCICE", "dot", "graphviz", "XML", "interactive", "configuration", "visualization" ]
+keywords = [ "preCICE", "dot", "graphviz", "XML",  "configuration", "visualization" ]
 classifiers=[
 "Development Status :: 4 - Beta",
 "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -37,16 +37,8 @@ Repository = "https://github.com/precice/config-visualizer.git"
 [project.scripts]
 precice-config-visualizer = "preciceconfigvisualizer.cli:main"
 
-[project.gui-scripts]
-precice-config-visualizer-gui = "preciceconfigvisualizer.gui:main"
-
 [tool.setuptools]
 packages=["preciceconfigvisualizer"]
-
-[tool.setuptools.data-files]
-"share/applications" = ["data/org.precice.config_visualizer.desktop"]
-"share/metainfo" = ["data/org.precice.config_visualizer.metainfo.xml"]
-"share/icons/hicolor/scalable/apps/" = ["data/org.precice.config_visualizer.svg"]
 
 [tool.setuptools-git-versioning]
 enabled = true

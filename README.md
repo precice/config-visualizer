@@ -12,20 +12,6 @@ pipx install precice-config-visualizer
 
 ## Usage
 
-The config visualizer can be use via the CLI or the interactive GUI.
-
-### GUI
-
-```
-precice-config-visualizer-gui [CONFIG-FILE]
-```
-
-You can launch the GUI directly from the command line.
-Passing the path to a configuration file is optional.
-All further adjustments are made directly in the GUI.
-
-### CLI
-
 ```
 precice-config-visualizer --help
 precice-config-visualizer [OPTIONS] [-o OUTFILE] [<CONFIG-FILE>]
