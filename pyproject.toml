@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name="precice-config-visualizer"
 dynamic = [ "version" ]
 dependencies = [
-    "lxml", "pydot", "xdot", "PyGObject"
+    "lxml", "pydot", "xdot", "PyGObject", "typing_extensions"
 ]
 requires-python = ">=3.8"
 authors = [
