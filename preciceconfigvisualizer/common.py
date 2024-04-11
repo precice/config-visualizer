@@ -1,10 +1,17 @@
 import sys
-from typing import Literal, TypedDict, Unpack
 from collections import defaultdict
 from itertools import cycle
 
 import pydot
 from lxml import etree
+
+
+from typing import Literal, TypedDict
+
+if sys.version_info < (3, 11):
+    from typing_extensions import Unpack
+else:
+    from typing import Unpack
 
 
 if sys.version_info < (3, 6):
