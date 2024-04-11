@@ -2,8 +2,20 @@
 
 import argparse
 import sys
+import pydot
+import os
 
 from preciceconfigvisualizer.common import configFileToDotCode
+
+
+SUPPORTED_FORMATS = [
+    "dot",
+    "jpeg",
+    "jpg",
+    "pdf",
+    "png",
+    "svg",
+]
 
 
 def parse_args():
@@ -12,9 +24,9 @@ def parse_args():
         "-o",
         "--outfile",
         nargs="?",
-        type=argparse.FileType("w"),
+        type=argparse.FileType("wb"),
         default=sys.stdout,
-        help="The resulting dot file. Omit to output to stdout.",
+        help=f"The output file. Files with extensions {', '.join(SUPPORTED_FORMATS)} will be rendered using graphviz. Omit to output dot to stdout.",
     )
     displayChoices = ["full", "merged", "hide"]
     parser.add_argument(
@@ -69,7 +81,13 @@ def parse_args():
 def main():
     args = parse_args()
     dot = configFileToDotCode(args.infile, **vars(args))
-    args.outfile.write(dot)
+
+    ext = os.path.splitext(args.outfile.name)[1].lower().lstrip(".")
+    if ext in SUPPORTED_FORMATS:
+        g = pydot.graph_from_dot_data(dot)[0]
+        args.outfile.write(g.create(format=ext))
+    else:
+        args.outfile.write(dot.encode())
 
 
 if __name__ == "__main__":
