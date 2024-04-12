@@ -9,7 +9,6 @@ from preciceconfigvisualizer.common import configFileToDotCode
 
 
 SUPPORTED_FORMATS = [
-    "dot",
     "jpeg",
     "jpg",
     "pdf",
