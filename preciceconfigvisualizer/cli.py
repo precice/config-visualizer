@@ -23,7 +23,7 @@ def parse_args():
         "-o",
         "--outfile",
         nargs="?",
-        type=argparse.FileType("wb"),
+        type=argparse.FileType("w"),
         default=sys.stdout,
         help=f"The output file. Files with extensions {', '.join(SUPPORTED_FORMATS)} will be rendered using graphviz. Omit to output dot to stdout.",
     )
@@ -86,7 +86,8 @@ def main():
         g = pydot.graph_from_dot_data(dot)[0]
         args.outfile.write(g.create(format=ext))
     else:
-        args.outfile.write(dot.encode())
+        # sys.stdout is always in utf-8 mode, so we do the same for the outfile
+        args.outfile.write(dot)
 
 
 if __name__ == "__main__":
