@@ -6,7 +6,7 @@ import pydot
 from lxml import etree
 
 
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, Union, List, Dict
 
 if sys.version_info < (3, 11):
     from typing_extensions import Unpack
@@ -73,7 +73,7 @@ def addUniqueEdge(g: pydot.Graph, src: str, dst: str, **attrs) -> pydot.Edge:
     return e
 
 
-def getEdge(g: pydot.Graph, src: str, dst: str) -> pydot.Edge | None:
+def getEdge(g: pydot.Graph, src: str, dst: str) -> Union[pydot.Edge, None]:
     for e in g.get_edge_list():
         es, ed = e.get_source().strip('"'), e.get_destination().strip('"')
         if es == src and ed == dst:
@@ -81,13 +81,13 @@ def getEdge(g: pydot.Graph, src: str, dst: str) -> pydot.Edge | None:
     return None
 
 
-def getParticipantNames(solverinterface: etree._Element) -> list[str]:
+def getParticipantNames(solverinterface: etree._Element) -> List[str]:
     return [p.attrib["name"] for p in solverinterface.findall("participant")]
 
 
 def getParticipantColor(
     solverinterface: str, use_colors: bool = False
-) -> dict[str, str]:
+) -> Dict[str, str]:
     names = getParticipantNames(solverinterface)
     colors = None
     if not use_colors:
