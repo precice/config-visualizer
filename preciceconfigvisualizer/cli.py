@@ -23,7 +23,7 @@ def parse_args():
         "-o",
         "--outfile",
         nargs="?",
-        type=argparse.FileType("w"),
+        type=argparse.FileType("wb"),
         default=sys.stdout,
         help=f"The output file. Files with extensions {', '.join(SUPPORTED_FORMATS)} will be rendered using graphviz. Omit to output dot to stdout.",
     )
