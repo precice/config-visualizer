@@ -23,8 +23,8 @@ def parse_args():
         "-o",
         "--outfile",
         nargs="?",
-        type=argparse.FileType("w"),
-        default=sys.stdout,
+        type=argparse.FileType("wb"),
+        default=sys.stdout.buffer,  # sys.stdout is always in utf-8 mode, so we need to use the underlying buffer to write bytes
         help=f"The output file. Files with extensions {', '.join(SUPPORTED_FORMATS)} will be rendered using graphviz. Omit to output dot to stdout.",
     )
     displayChoices = ["full", "merged", "hide"]
@@ -77,17 +77,18 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
+def main() -> None:
     args = parse_args()
-    dot = configFileToDotCode(args.infile, **vars(args))
+    dot: str = configFileToDotCode(args.infile, **vars(args))
 
-    ext = os.path.splitext(args.outfile.name)[1].lower().lstrip(".")
+    ext: str = os.path.splitext(args.outfile.name)[1].lower().lstrip(".")
+    data: bytes
     if ext in SUPPORTED_FORMATS:
         g = pydot.graph_from_dot_data(dot)[0]
-        args.outfile.write(g.create(format=ext))
+        data = g.create(format=ext)
     else:
-        # sys.stdout is always in utf-8 mode, so we do the same for the outfile
-        args.outfile.write(dot)
+        data = dot.encode()
+    args.outfile.write(data)
 
 
 if __name__ == "__main__":
