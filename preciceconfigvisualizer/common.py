@@ -20,6 +20,11 @@ if sys.version_info < (3, 6):
         " with python {}.{}".format(sys.version_info.major.sys.version_info.minor)
     )
 
+
+class VisualizerException(Exception):
+    pass
+
+
 VISIBILITY_TYPE = Literal["full", "merged", "hide"]
 
 
@@ -159,12 +164,29 @@ def configToGraph(
     meshes = {}
     meshDims = {}
     participantClusterName = {}
+
+    def lookupParticipantClusterFor(name):
+        if name not in participantClusterName:
+            raise VisualizerException(
+                f"The participant {name} wasn't found. Known participants are: "
+                + ", ".join(participantClusterName.keys())
+            )
+        return participantClusterName[name]
+
     m2nCluster = pydot.Cluster("m2n", label=quote("Communicators"))
     g.add_subgraph(m2nCluster)
     cplCluster = pydot.Cluster("cpl", label=quote("Coupling Schemes"))
     g.add_subgraph(cplCluster)
 
     participantColor = getParticipantColor(root, colors)
+
+    def lookupParticipantColor(name):
+        if name not in participantColor:
+            raise VisualizerException(
+                f"The participant {name} wasn't found. Known participants are: "
+                + ", ".join(participantColor.keys())
+            )
+        return participantColor[name]
 
     for elem in findAllWithPrefix(root, "data"):
         kind = elem.tag[elem.tag.find(":") + 1 :]
@@ -180,7 +202,7 @@ def configToGraph(
         name = elem.attrib["name"]
         participant = pydot.Cluster(name, label=quote(name), style="bold")
         participantClusterName[name] = participant.get_name()
-        color = participantColor[name]
+        color = lookupParticipantColor(name)
         addNode(participant, name, color=color, shape="doubleoctagon")
         # use-mesh
         for use in elem.findall("use-mesh"):
@@ -208,7 +230,7 @@ def configToGraph(
                     meshname,
                     shape="cylinder",
                     label=label,
-                    color=participantColor[pfrom],
+                    color=lookupParticipantColor(pfrom),
                     style="dashed",
                 )
         # provide-mesh
@@ -237,7 +259,7 @@ def configToGraph(
                 meshname,
                 shape="cylinder",
                 label=quote(f"{mesh}\nfrom {pfrom}"),
-                color=participantColor[pfrom],
+                color=lookupParticipantColor(pfrom),
                 style="dashed",
             )
         # read-data
@@ -331,25 +353,25 @@ def configToGraph(
                 g,
                 name,
                 pto,
-                lhead=participantClusterName[pto],
+                lhead=lookupParticipantClusterFor(pto),
                 dir="both",
-                color=participantColor[pto],
+                color=lookupParticipantColor(pto),
             )
             addEdge(
                 g,
                 name,
                 pfrom,
-                lhead=participantClusterName[pfrom],
+                lhead=lookupParticipantClusterFor(pfrom),
                 dir="both",
-                color=participantColor[pfrom],
+                color=lookupParticipantColor(pfrom),
             )
         if communicators == "merged":
             addEdge(
                 g,
                 pfrom,
                 pto,
-                lhead=participantClusterName[pto],
-                ltail=participantClusterName[pfrom],
+                lhead=lookupParticipantClusterFor(pto),
+                ltail=lookupParticipantClusterFor(pfrom),
                 label=quote(kind),
                 dir="both",
             )
@@ -370,8 +392,8 @@ def configToGraph(
                         g,
                         name,
                         thisName,
-                        lhead=participantClusterName[thisName],
-                        color=participantColor[thisName],
+                        lhead=lookupParticipantClusterFor(thisName),
+                        color=lookupParticipantColor(thisName),
                     )
                     if other.get("control"):
                         e.set_taillabel("Controller")
@@ -398,7 +420,7 @@ def configToGraph(
                     first,
                     lhead=participantClusterName[first],
                     taillabel=quote("first"),
-                    color=participantColor[first],
+                    color=lookupParticipantColor(first),
                 )
                 addEdge(
                     g,
@@ -406,7 +428,7 @@ def configToGraph(
                     second,
                     lhead=participantClusterName[second],
                     taillabel=quote("second"),
-                    color=participantColor[second],
+                    color=lookupParticipantColor(second),
                 )
             elif cplschemes == "merged":
                 addUniqueEdge(
@@ -429,7 +451,7 @@ def configToGraph(
             init = isTrue(exchange.get("initialize", "no"))
             withSubsteps = isTrue(exchange.get("substeps", "no"))
             if data_exchange == "full":
-                pcolor = participantColor[pfrom]
+                pcolor = lookupParticipantColor(pfrom)
                 style = "bold" if init else ""
                 tooltip = dataType[data] + (" initialized" if init else "")
                 color = f"{pcolor}:invis:{pcolor}" if withSubsteps else pcolor
@@ -447,7 +469,7 @@ def configToGraph(
                     g,
                     f"{pfrom}-{mesh}",
                     f"{pto}-{mesh}",
-                    color=participantColor[pfrom],
+                    color=lookupParticipantColor(pfrom),
                 )
 
     return g
