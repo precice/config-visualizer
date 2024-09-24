@@ -5,7 +5,7 @@ import sys
 import pydot
 import os
 
-from preciceconfigvisualizer.common import configFileToDotCode
+from preciceconfigvisualizer.common import configFileToDotCode, VisualizerException
 
 
 SUPPORTED_FORMATS = [
@@ -79,7 +79,11 @@ def parse_args():
 
 def main() -> None:
     args = parse_args()
-    dot: str = configFileToDotCode(args.infile, **vars(args))
+    try:
+        dot: str = configFileToDotCode(args.infile, **vars(args))
+    except VisualizerException as e:
+        print(f"Failed to visualize config: {e.args[0]}", file=sys.stderr)
+        sys.exit(1)
 
     ext: str = os.path.splitext(args.outfile.name)[1].lower().lstrip(".")
     data: bytes
