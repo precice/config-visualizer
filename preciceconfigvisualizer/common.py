@@ -163,7 +163,7 @@ def configToGraph(
     dataType = {}
     meshes = {}
     meshDims = {}
-    participantClusterName = {}
+    participantClusterName: Dict[str, str] = {}
 
     def lookupParticipantClusterFor(name):
         if name not in participantClusterName:
