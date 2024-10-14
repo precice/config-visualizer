@@ -309,6 +309,7 @@ def configToGraph(
             wpname = watchpoint.attrib["name"]
             wpcoord = watchpoint.attrib["coordinate"]
             if watchpoints:
+                meshNode = f"{name}-{wpmesh}"
                 wpnode = f"{name}-WP-{wpname}"
                 addNode(
                     participant,
@@ -317,7 +318,7 @@ def configToGraph(
                     label=quote(f"{wpname}\nat ({wpcoord})"),
                     color=color,
                 )
-                addEdge(participant, wpnode, name, color=color)
+                addEdge(participant, meshNode, wpnode, color=color)
 
         # other children
         for child in elem.iterchildren():
