@@ -262,17 +262,49 @@ def configToGraph(
                 color=lookupParticipantColor(pfrom),
                 style="dashed",
             )
+
+        jit_to = {}
+        jit_from = {}
+
+        # mappings
+        for child in elem.iterchildren():
+            # register mappings
+            if child.tag.startswith("mapping:"):
+                mkind = child.tag[child.tag.find(":") + 1 :]
+
+                # Save jit mappings for read/write data annotations
+                if "from" not in child.attrib:
+                    jit_to[child.attrib.get("to")] = mkind
+                    continue
+
+                if "to" not in child.attrib:
+                    jit_from[child.attrib.get("from")] = mkind
+                    continue
+
+                # Normal mapping
+                mfrom = name + "-" + child.attrib.get("from")
+                mto = name + "-" + child.attrib.get("to")
+                if mappings == "full":
+                    addEdge(participant, mfrom, mto, label=quote(mkind), color=color)
+                elif mappings == "merged":
+                    e = getEdge(participant, mto, mfrom)
+                    if e is None:
+                        addEdge(participant, mfrom, mto, color=color)
+                    else:
+                        e.set_dir("both")
+
         # read-data
         for read in elem.findall("read-data"):
             mesh = read.attrib["mesh"]
             meshNode = f"{name}-{mesh}"
             data = read.attrib["name"]
             if data_access == "full":
+                label = data + f" (JIT {jit_from[mesh]})" if mesh in jit_from else ""
                 addEdge(
                     participant,
                     meshNode,
                     name,
-                    label=quote(data),
+                    label=label,
                     tooltip=dataType[data],
                     color=color,
                 )
@@ -288,11 +320,12 @@ def configToGraph(
             meshNode = f"{name}-{mesh}"
             data = write.attrib["name"]
             if data_access == "full":
+                label = data + f" (JIT {jit_to[mesh]})" if mesh in jit_to else ""
                 addEdge(
                     participant,
                     name,
                     meshNode,
-                    label=quote(data),
+                    label=label,
                     tooltip=dataType[data],
                     color=color,
                 )
@@ -319,22 +352,6 @@ def configToGraph(
                     color=color,
                 )
                 addEdge(participant, meshNode, wpnode, color=color)
-
-        # other children
-        for child in elem.iterchildren():
-            # register mappings
-            if child.tag.startswith("mapping:"):
-                mkind = child.tag[child.tag.find(":") + 1 :]
-                mfrom = name + "-" + child.attrib["from"]
-                mto = name + "-" + child.attrib["to"]
-                if mappings == "full":
-                    addEdge(participant, mfrom, mto, label=quote(mkind), color=color)
-                elif mappings == "merged":
-                    e = getEdge(participant, mto, mfrom)
-                    if e is None:
-                        addEdge(participant, mfrom, mto, color=color)
-                    else:
-                        e.set_dir("both")
 
             # master
             if child.tag.startswith("master:"):
