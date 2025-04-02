@@ -299,7 +299,7 @@ def configToGraph(
             meshNode = f"{name}-{mesh}"
             data = read.attrib["name"]
             if data_access == "full":
-                label = data + f" (JIT {jit_from[mesh]})" if mesh in jit_from else ""
+                label = data + (f" (JIT {jit_from[mesh]})" if mesh in jit_from else "")
                 addEdge(
                     participant,
                     meshNode,
@@ -320,7 +320,7 @@ def configToGraph(
             meshNode = f"{name}-{mesh}"
             data = write.attrib["name"]
             if data_access == "full":
-                label = data + f" (JIT {jit_to[mesh]})" if mesh in jit_to else ""
+                label = data + (f" (JIT {jit_to[mesh]})" if mesh in jit_to else "")
                 addEdge(
                     participant,
                     name,
