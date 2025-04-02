@@ -13,7 +13,7 @@
     <read-data name="Scalar-Data" mesh="Received-Mesh" />
     <write-data name="Other-Scalar-Data" mesh="Received-Mesh" />
     <mapping:rbf direction="read" from="Received-Mesh" constraint="consistent" />
-    <mapping:rbf direction="write"  to="Received-Mesh" constraint="conservative" />
+    <mapping:nearest-neighbour direction="write"  to="Received-Mesh" constraint="conservative" />
   </participant>
 
   <participant name="SolverTwo">
