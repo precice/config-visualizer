@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<precice-configuration>
+  <data:scalar name="Other-Scalar-Data" />
+  <data:scalar name="Scalar-Data" />
+
+  <mesh name="Received-Mesh" dimensions="2">
+    <use-data name="Scalar-Data" />
+    <use-data name="Other-Scalar-Data" />
+  </mesh>
+
+  <participant name="SolverOne">
+    <receive-mesh name="Received-Mesh" from="SolverTwo" api-access="true" />
+    <read-data name="Scalar-Data" mesh="Received-Mesh" />
+    <write-data name="Other-Scalar-Data" mesh="Received-Mesh" />
+    <mapping:rbf direction="read" from="Received-Mesh" constraint="consistent" />
+    <mapping:rbf direction="write"  to="Received-Mesh" constraint="conservative" />
+  </participant>
+
+  <participant name="SolverTwo">
+    <provide-mesh name="Received-Mesh" />
+    <write-data name="Scalar-Data" mesh="Received-Mesh" />
+    <read-data name="Other-Scalar-Data" mesh="Received-Mesh" />
+  </participant>
+
+  <m2n:sockets acceptor="SolverOne" connector="SolverTwo" exchange-directory=".." />
+
+  <coupling-scheme:parallel-explicit>
+    <time-window-size value="0.01" />
+    <max-time value="5" />
+    <participants first="SolverOne" second="SolverTwo" />
+    <exchange data="Other-Scalar-Data" mesh="Received-Mesh" from="SolverOne" to="SolverTwo" />
+    <exchange data="Scalar-Data" mesh="Received-Mesh" from="SolverTwo" to="SolverOne" />
+  </coupling-scheme:parallel-explicit>
+</precice-configuration>
