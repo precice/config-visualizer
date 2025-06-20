@@ -18,7 +18,10 @@ SUPPORTED_FORMATS = [
 
 
 def makeVisualizeParser(add_help: bool = True):
-    parser = argparse.ArgumentParser(add_help=add_help)
+    parser = argparse.ArgumentParser(
+        add_help=add_help,
+        description="Visualize a preCICE configuration file as a graph.",
+    )
     parser.add_argument(
         "-o",
         "--outfile",
