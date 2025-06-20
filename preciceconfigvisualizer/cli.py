@@ -17,8 +17,8 @@ SUPPORTED_FORMATS = [
 ]
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
+def makeVisualizationParser(add_help: bool = True):
+    parser = argparse.ArgumentParser(add_help=add_help)
     parser.add_argument(
         "-o",
         "--outfile",
@@ -74,26 +74,36 @@ def parse_args():
         "--margin", default=0, type=int, help="Margin around cluster borders in points."
     )
     parser.add_argument("infile", type=str, help="The XML configuration file.")
-    return parser.parse_args()
+    return parser
 
 
-def main() -> None:
-    args = parse_args()
+def parse_args():
+    return makeVisualizationParser().parse_args()
+
+
+def runVisualize(ns) -> int:
     try:
-        dot: str = configFileToDotCode(args.infile, **vars(args))
+        dot: str = configFileToDotCode(ns.infile, **vars(ns))
     except VisualizerException as e:
         print(f"Failed to visualize config: {e.args[0]}", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
-    ext: str = os.path.splitext(args.outfile.name)[1].lower().lstrip(".")
+    ext: str = os.path.splitext(ns.outfile.name)[1].lower().lstrip(".")
     data: bytes
     if ext in SUPPORTED_FORMATS:
         g = pydot.graph_from_dot_data(dot)[0]
         data = g.create(format=ext)
     else:
         data = dot.encode()
-    args.outfile.write(data)
+    ns.outfile.write(data)
+
+    return 0
+
+
+def main() -> int:
+    args = parse_args()
+    return runVisualize(ns)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
