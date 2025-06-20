@@ -102,7 +102,7 @@ def runVisualize(ns) -> int:
 
 def main() -> int:
     args = parse_args()
-    return runVisualize(ns)
+    return runVisualize(args)
 
 
 if __name__ == "__main__":
