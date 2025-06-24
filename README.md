@@ -59,3 +59,15 @@ For a full list of options, run:
 ```
 precice-config-visualizer --help
 ```
+
+## Licensing
+
+The license was changed from GPLv3 to MIT in approval of all contributors at the point of change:
+
+| Contributor | Approved when |
+| --- | --- |
+|`Benjamin Rodenberg <benjamin.rodenberg@cit.tum.de>` | 23.06.2025 16:30 CET |
+|`Benjamin Uekermann <benjamin.uekermann@gmail.com` | 23.06.2025 16:59 CET |
+|`Frédéric Simonis <simonisfrederic@gmail.com` | 23.06.2025 17:56 CET |
+|`Gerasimos Chourdakis <makishourdakis@gmail.com` | 23.06.2025 16:53 CET |
+|`Keefe Huang <huangq1234553@gmail.com` | 23.06.2025 17:51 CET |

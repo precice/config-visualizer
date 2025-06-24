@@ -17,11 +17,11 @@ maintainers = [
 ]
 description="A tool for visualizing a preCICE configuration file as a dot file."
 readme = "README.md"
-license={ text = "GPLv3" }
+license="MIT"
+license-files=["LICENSE"]
 keywords = [ "preCICE", "dot", "graphviz", "XML",  "configuration", "visualization" ]
 classifiers=[
 "Development Status :: 4 - Beta",
-"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 "Programming Language :: Python :: 3 :: Only",
 "Programming Language :: Python :: 3.8",
 "Topic :: Scientific/Engineering :: Visualization",
